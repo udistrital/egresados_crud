@@ -1,0 +1,75 @@
+package models
+
+import (
+	"time"
+
+	"github.com/beego/beego/v2/client/orm"
+)
+
+// Beneficio publicado por una empresa aliada para egresados.
+type Beneficio struct {
+	Id                 int                `orm:"column(id);auto;pk" json:"id"`
+	Empresa            *Empresa           `orm:"column(empresa_id);rel(fk)" json:"empresa"`
+	CategoriaBeneficio *CategoriaBeneficio `orm:"column(categoria_beneficio_id);rel(fk)" json:"categoria_beneficio"`
+	EstadoBeneficio    *EstadoBeneficio   `orm:"column(estado_beneficio_id);rel(fk)" json:"estado_beneficio"`
+	Titulo             string             `orm:"column(titulo);size(200)" json:"titulo"`
+	Descripcion        string             `orm:"column(descripcion);type(text)" json:"descripcion"`
+	Condiciones        string             `orm:"column(condiciones);type(text)" json:"condiciones"`
+	FechaInicio        time.Time          `orm:"column(fecha_inicio);type(date)" json:"fecha_inicio"`
+	FechaFin           time.Time          `orm:"column(fecha_fin);type(date)" json:"fecha_fin"`
+	CuposTotal         int                `orm:"column(cupos_total)" json:"cupos_total"`
+	CuposDisponibles   int                `orm:"column(cupos_disponibles)" json:"cupos_disponibles"`
+	ImagenUrl          string             `orm:"column(imagen_url);size(500);null" json:"imagen_url,omitempty"`
+	FechaPublicacion   time.Time          `orm:"column(fecha_publicacion);null;type(datetime)" json:"fecha_publicacion,omitempty"`
+	UsuarioCreador     *Usuario           `orm:"column(usuario_creador_id);rel(fk)" json:"usuario_creador"`
+	Activo             bool               `orm:"column(activo);default(true)" json:"activo"`
+	FechaCreacion      time.Time          `orm:"column(fecha_creacion);auto_now_add;type(datetime)" json:"fecha_creacion"`
+	FechaModificacion  time.Time          `orm:"column(fecha_modificacion);auto_now;type(datetime)" json:"fecha_modificacion"`
+}
+
+func (b *Beneficio) TableName() string { return "beneficio" }
+
+func init() { orm.RegisterModel(new(Beneficio)) }
+
+func AddBeneficio(m *Beneficio) (id int64, err error) {
+	o := orm.NewOrm()
+	id, err = o.Insert(m)
+	return
+}
+
+func GetBeneficioById(id int) (v *Beneficio, err error) {
+	o := orm.NewOrm()
+	v = &Beneficio{Id: id}
+	if err = o.Read(v); err == nil {
+		o.LoadRelated(v, "Empresa")
+		o.LoadRelated(v, "CategoriaBeneficio")
+		o.LoadRelated(v, "EstadoBeneficio")
+		o.LoadRelated(v, "UsuarioCreador")
+		return v, nil
+	}
+	return nil, err
+}
+
+func GetAllBeneficio() (ml []Beneficio, err error) {
+	o := orm.NewOrm()
+	_, err = o.QueryTable(new(Beneficio)).Filter("Activo", true).RelatedSel().All(&ml)
+	return
+}
+
+func UpdateBeneficioById(m *Beneficio) (err error) {
+	o := orm.NewOrm()
+	m.FechaModificacion = time.Now()
+	_, err = o.Update(m)
+	return
+}
+
+func DeleteBeneficio(id int) (err error) {
+	o := orm.NewOrm()
+	v := Beneficio{Id: id}
+	if err = o.Read(&v); err == nil {
+		v.Activo = false
+		v.FechaModificacion = time.Now()
+		_, err = o.Update(&v, "Activo", "FechaModificacion")
+	}
+	return
+}
