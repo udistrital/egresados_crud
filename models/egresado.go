@@ -40,10 +40,11 @@ func GetEgresadoById(id int) (v *Egresado, err error) {
 	return nil, err
 }
 
-func GetAllEgresado() (ml []Egresado, err error) {
-	o := orm.NewOrm()
-	_, err = o.QueryTable(new(Egresado)).Filter("Activo", true).RelatedSel().All(&ml)
-	return
+func GetAllEgresado(query map[string]string, fields []string, sortby []string,
+	order []string, offset int64, limit int64) (ml []interface{}, err error) {
+	qs := orm.NewOrm().QueryTable(new(Egresado)).RelatedSel()
+	var l []Egresado
+	return getAllQuery(qs, query, fields, sortby, order, offset, limit, &l)
 }
 
 func UpdateEgresadoById(m *Egresado) (err error) {

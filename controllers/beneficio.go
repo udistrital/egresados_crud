@@ -11,11 +11,19 @@ import (
 type BeneficioController struct{ web.Controller }
 
 func (c *BeneficioController) GetAll() {
-	results, err := models.GetAllBeneficio()
+	query, fields, sortby, order, offset, limit, err := parseGetAllParams(&c.Controller)
 	if err != nil {
-		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(400); c.Data["json"] = err.Error(); c.ServeJSON(); return
+	}
+	l, err := models.GetAllBeneficio(query, fields, sortby, order, offset, limit)
+	if err != nil {
+		c.Ctx.Output.SetStatus(404); c.Data["json"] = err.Error()
 	} else {
-		c.Data["json"] = results
+		if l == nil {
+			// lista vacía → [{}]: idioma estándar de los *_crud del SGA
+			l = append(l, map[string]interface{}{})
+		}
+		c.Data["json"] = l
 	}
 	c.ServeJSON()
 }

@@ -7,11 +7,13 @@ import (
 )
 
 // Beneficio publicado por una empresa aliada para egresados.
+// CategoriaBeneficioId y EstadoBeneficioId referencian parametro.parametro
+// (tipos CATEGORIA_BENEFICIO y ESTADO_BENEFICIO); sin FK local (C-1).
 type Beneficio struct {
-	Id                 int                `orm:"column(id);auto;pk" json:"id"`
-	Empresa            *Empresa           `orm:"column(empresa_id);rel(fk)" json:"empresa"`
-	CategoriaBeneficio *CategoriaBeneficio `orm:"column(categoria_beneficio_id);rel(fk)" json:"categoria_beneficio"`
-	EstadoBeneficio    *EstadoBeneficio   `orm:"column(estado_beneficio_id);rel(fk)" json:"estado_beneficio"`
+	Id                   int      `orm:"column(id);auto;pk" json:"id"`
+	Empresa              *Empresa `orm:"column(empresa_id);rel(fk)" json:"empresa"`
+	CategoriaBeneficioId int      `orm:"column(categoria_beneficio_id)" json:"categoria_beneficio_id"`
+	EstadoBeneficioId    int      `orm:"column(estado_beneficio_id)" json:"estado_beneficio_id"`
 	Titulo             string             `orm:"column(titulo);size(200)" json:"titulo"`
 	Descripcion        string             `orm:"column(descripcion);type(text)" json:"descripcion"`
 	Condiciones        string             `orm:"column(condiciones);type(text)" json:"condiciones"`
@@ -42,18 +44,17 @@ func GetBeneficioById(id int) (v *Beneficio, err error) {
 	v = &Beneficio{Id: id}
 	if err = o.Read(v); err == nil {
 		o.LoadRelated(v, "Empresa")
-		o.LoadRelated(v, "CategoriaBeneficio")
-		o.LoadRelated(v, "EstadoBeneficio")
 		o.LoadRelated(v, "UsuarioCreador")
 		return v, nil
 	}
 	return nil, err
 }
 
-func GetAllBeneficio() (ml []Beneficio, err error) {
-	o := orm.NewOrm()
-	_, err = o.QueryTable(new(Beneficio)).Filter("Activo", true).RelatedSel().All(&ml)
-	return
+func GetAllBeneficio(query map[string]string, fields []string, sortby []string,
+	order []string, offset int64, limit int64) (ml []interface{}, err error) {
+	qs := orm.NewOrm().QueryTable(new(Beneficio)).RelatedSel()
+	var l []Beneficio
+	return getAllQuery(qs, query, fields, sortby, order, offset, limit, &l)
 }
 
 func UpdateBeneficioById(m *Beneficio) (err error) {

@@ -36,10 +36,11 @@ func GetSecuenciaRadicadoById(id int) (v *SecuenciaRadicado, err error) {
 	return nil, err
 }
 
-func GetAllSecuenciaRadicado() (ml []SecuenciaRadicado, err error) {
-	o := orm.NewOrm()
-	_, err = o.QueryTable(new(SecuenciaRadicado)).Filter("Activo", true).All(&ml)
-	return
+func GetAllSecuenciaRadicado(query map[string]string, fields []string, sortby []string,
+	order []string, offset int64, limit int64) (ml []interface{}, err error) {
+	qs := orm.NewOrm().QueryTable(new(SecuenciaRadicado))
+	var l []SecuenciaRadicado
+	return getAllQuery(qs, query, fields, sortby, order, offset, limit, &l)
 }
 
 // SiguienteRadicado incrementa atómicamente el contador del año actual y retorna el número.

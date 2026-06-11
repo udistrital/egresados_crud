@@ -40,8 +40,9 @@ func GetBitacoraAccesoPiiById(id int) (v *BitacoraAccesoPii, err error) {
 	return nil, err
 }
 
-func GetAllBitacoraAccesoPii() (ml []BitacoraAccesoPii, err error) {
-	o := orm.NewOrm()
-	_, err = o.QueryTable(new(BitacoraAccesoPii)).OrderBy("-FechaEvento").All(&ml)
-	return
+func GetAllBitacoraAccesoPii(query map[string]string, fields []string, sortby []string,
+	order []string, offset int64, limit int64) (ml []interface{}, err error) {
+	qs := orm.NewOrm().QueryTable(new(BitacoraAccesoPii)).RelatedSel()
+	var l []BitacoraAccesoPii
+	return getAllQuery(qs, query, fields, sortby, order, offset, limit, &l)
 }

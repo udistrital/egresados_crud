@@ -6,27 +6,9 @@ import (
 )
 
 func init() {
-	// ── Catálogos ─────────────────────────────────────────────────────────────
-	web.Router("/v1/tipo_usuario", &controllers.TipoUsuarioController{}, "get:GetAll;post:Post")
-	web.Router("/v1/tipo_usuario/:id", &controllers.TipoUsuarioController{}, "get:GetOne;put:Put;delete:Delete")
-
-	web.Router("/v1/estado_empresa", &controllers.EstadoEmpresaController{}, "get:GetAll;post:Post")
-	web.Router("/v1/estado_empresa/:id", &controllers.EstadoEmpresaController{}, "get:GetOne;put:Put;delete:Delete")
-
-	web.Router("/v1/estado_beneficio", &controllers.EstadoBeneficioController{}, "get:GetAll;post:Post")
-	web.Router("/v1/estado_beneficio/:id", &controllers.EstadoBeneficioController{}, "get:GetOne;put:Put;delete:Delete")
-
-	web.Router("/v1/estado_solicitud", &controllers.EstadoSolicitudController{}, "get:GetAll;post:Post")
-	web.Router("/v1/estado_solicitud/:id", &controllers.EstadoSolicitudController{}, "get:GetOne;put:Put;delete:Delete")
-
-	web.Router("/v1/categoria_beneficio", &controllers.CategoriaBeneficioController{}, "get:GetAll;post:Post")
-	web.Router("/v1/categoria_beneficio/:id", &controllers.CategoriaBeneficioController{}, "get:GetOne;put:Put;delete:Delete")
-
-	web.Router("/v1/sector_economico", &controllers.SectorEconomicoController{}, "get:GetAll;post:Post")
-	web.Router("/v1/sector_economico/:id", &controllers.SectorEconomicoController{}, "get:GetOne;put:Put;delete:Delete")
-
-	web.Router("/v1/parametro_sistema", &controllers.ParametroSistemaController{}, "get:GetAll;post:Post")
-	web.Router("/v1/parametro_sistema/:id", &controllers.ParametroSistemaController{}, "get:GetOne;put:Put;delete:Delete")
+	// Los catálogos (tipo_usuario, estados, categorías, sectores, parámetros de
+	// sistema) viven en el servicio institucional de parámetros (C-1);
+	// este CRUD solo expone las entidades propias del módulo.
 
 	// ── Entidades ─────────────────────────────────────────────────────────────
 	web.Router("/v1/usuario", &controllers.UsuarioController{}, "get:GetAll;post:Post")
@@ -45,13 +27,17 @@ func init() {
 	web.Router("/v1/beneficio/:id", &controllers.BeneficioController{}, "get:GetOne;put:Put;delete:Delete")
 
 	web.Router("/v1/secuencia_radicado", &controllers.SecuenciaRadicadoController{}, "get:GetAll;post:Post")
+	web.Router("/v1/secuencia_radicado/siguiente/:anio", &controllers.SecuenciaRadicadoController{}, "post:Siguiente")
 	web.Router("/v1/secuencia_radicado/:id", &controllers.SecuenciaRadicadoController{}, "get:GetOne;put:Put;delete:Delete")
 
 	web.Router("/v1/solicitud_beneficio", &controllers.SolicitudBeneficioController{}, "get:GetAll;post:Post")
 	web.Router("/v1/solicitud_beneficio/:id", &controllers.SolicitudBeneficioController{}, "get:GetOne;put:Put;delete:Delete")
 
-	web.Router("/v1/historial_estado_solicitud", &controllers.HistorialEstadoSolicitudController{}, "get:GetAll;post:Post")
-	web.Router("/v1/historial_estado_solicitud/:id", &controllers.HistorialEstadoSolicitudController{}, "get:GetOne;put:Put;delete:Delete")
+	// historial_solicitud: única fuente de estado de las solicitudes (C-4b)
+	web.Router("/v1/historial_solicitud", &controllers.HistorialSolicitudController{}, "get:GetAll;post:Post")
+	web.Router("/v1/historial_solicitud/solicitud/:solicitud_id", &controllers.HistorialSolicitudController{}, "get:GetBySolicitud")
+	web.Router("/v1/historial_solicitud/solicitud/:solicitud_id/vigente", &controllers.HistorialSolicitudController{}, "get:GetVigente")
+	web.Router("/v1/historial_solicitud/:id", &controllers.HistorialSolicitudController{}, "get:GetOne;put:Put;delete:Delete")
 
 	web.Router("/v1/mensaje_solicitud", &controllers.MensajeSolicitudController{}, "get:GetAll;post:Post")
 	web.Router("/v1/mensaje_solicitud/:id", &controllers.MensajeSolicitudController{}, "get:GetOne;put:Put;delete:Delete")

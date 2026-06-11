@@ -12,11 +12,18 @@ import (
 type BitacoraAccesoPiiController struct{ web.Controller }
 
 func (c *BitacoraAccesoPiiController) GetAll() {
-	results, err := models.GetAllBitacoraAccesoPii()
+	query, fields, sortby, order, offset, limit, err := parseGetAllParams(&c.Controller)
 	if err != nil {
-		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(400); c.Data["json"] = err.Error(); c.ServeJSON(); return
+	}
+	l, err := models.GetAllBitacoraAccesoPii(query, fields, sortby, order, offset, limit)
+	if err != nil {
+		c.Ctx.Output.SetStatus(404); c.Data["json"] = err.Error()
 	} else {
-		c.Data["json"] = results
+		if l == nil {
+			l = append(l, map[string]interface{}{})
+		}
+		c.Data["json"] = l
 	}
 	c.ServeJSON()
 }

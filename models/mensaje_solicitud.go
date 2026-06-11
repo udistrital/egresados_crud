@@ -39,10 +39,11 @@ func GetMensajeSolicitudById(id int) (v *MensajeSolicitud, err error) {
 	return nil, err
 }
 
-func GetAllMensajeSolicitud() (ml []MensajeSolicitud, err error) {
-	o := orm.NewOrm()
-	_, err = o.QueryTable(new(MensajeSolicitud)).Filter("Activo", true).RelatedSel().All(&ml)
-	return
+func GetAllMensajeSolicitud(query map[string]string, fields []string, sortby []string,
+	order []string, offset int64, limit int64) (ml []interface{}, err error) {
+	qs := orm.NewOrm().QueryTable(new(MensajeSolicitud)).RelatedSel()
+	var l []MensajeSolicitud
+	return getAllQuery(qs, query, fields, sortby, order, offset, limit, &l)
 }
 
 func UpdateMensajeSolicitudById(m *MensajeSolicitud) (err error) {

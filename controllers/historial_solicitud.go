@@ -8,14 +8,14 @@ import (
 	"github.com/udistrital/sga_crud_beneficios_egresados/models"
 )
 
-type SecuenciaRadicadoController struct{ web.Controller }
+type HistorialSolicitudController struct{ web.Controller }
 
-func (c *SecuenciaRadicadoController) GetAll() {
+func (c *HistorialSolicitudController) GetAll() {
 	query, fields, sortby, order, offset, limit, err := parseGetAllParams(&c.Controller)
 	if err != nil {
 		c.Ctx.Output.SetStatus(400); c.Data["json"] = err.Error(); c.ServeJSON(); return
 	}
-	l, err := models.GetAllSecuenciaRadicado(query, fields, sortby, order, offset, limit)
+	l, err := models.GetAllHistorialSolicitud(query, fields, sortby, order, offset, limit)
 	if err != nil {
 		c.Ctx.Output.SetStatus(404); c.Data["json"] = err.Error()
 	} else {
@@ -27,12 +27,12 @@ func (c *SecuenciaRadicadoController) GetAll() {
 	c.ServeJSON()
 }
 
-func (c *SecuenciaRadicadoController) GetOne() {
+func (c *HistorialSolicitudController) GetOne() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
 		c.Ctx.Output.SetStatus(400); c.Data["json"] = "id inválido"; c.ServeJSON(); return
 	}
-	result, err := models.GetSecuenciaRadicadoById(id)
+	result, err := models.GetHistorialSolicitudById(id)
 	if err != nil {
 		c.Ctx.Output.SetStatus(404); c.Data["json"] = err.Error()
 	} else {
@@ -41,28 +41,44 @@ func (c *SecuenciaRadicadoController) GetOne() {
 	c.ServeJSON()
 }
 
-// Siguiente POST /v1/secuencia_radicado/siguiente/:anio
-// Incrementa atómicamente el contador del año y retorna el número asignado (RN-RADICADO).
-func (c *SecuenciaRadicadoController) Siguiente() {
-	anio, err := strconv.Atoi(c.Ctx.Input.Param(":anio"))
+// GetBySolicitud GET /v1/historial_solicitud/solicitud/:solicitud_id
+// Bitácora completa de una solicitud (más reciente primero).
+func (c *HistorialSolicitudController) GetBySolicitud() {
+	solicitudId, err := strconv.Atoi(c.Ctx.Input.Param(":solicitud_id"))
 	if err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = "anio inválido"; c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400); c.Data["json"] = "solicitud_id inválido"; c.ServeJSON(); return
 	}
-	numero, err := models.SiguienteRadicado(anio)
+	results, err := models.GetHistorialSolicitudBySolicitud(solicitudId)
 	if err != nil {
 		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
 	} else {
-		c.Data["json"] = map[string]int{"anio": anio, "numero": numero}
+		c.Data["json"] = results
 	}
 	c.ServeJSON()
 }
 
-func (c *SecuenciaRadicadoController) Post() {
-	var v models.SecuenciaRadicado
+// GetVigente GET /v1/historial_solicitud/solicitud/:solicitud_id/vigente
+// Último registro de historial = estado vigente de la solicitud (C-4b).
+func (c *HistorialSolicitudController) GetVigente() {
+	solicitudId, err := strconv.Atoi(c.Ctx.Input.Param(":solicitud_id"))
+	if err != nil {
+		c.Ctx.Output.SetStatus(400); c.Data["json"] = "solicitud_id inválido"; c.ServeJSON(); return
+	}
+	result, err := models.GetEstadoVigenteBySolicitud(solicitudId)
+	if err != nil {
+		c.Ctx.Output.SetStatus(404); c.Data["json"] = err.Error()
+	} else {
+		c.Data["json"] = result
+	}
+	c.ServeJSON()
+}
+
+func (c *HistorialSolicitudController) Post() {
+	var v models.HistorialSolicitud
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err != nil {
 		c.Ctx.Output.SetStatus(400); c.Data["json"] = err.Error(); c.ServeJSON(); return
 	}
-	if id, err := models.AddSecuenciaRadicado(&v); err != nil {
+	if id, err := models.AddHistorialSolicitud(&v); err != nil {
 		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
 	} else {
 		c.Ctx.Output.SetStatus(201); c.Data["json"] = map[string]int64{"id": id}
@@ -70,17 +86,17 @@ func (c *SecuenciaRadicadoController) Post() {
 	c.ServeJSON()
 }
 
-func (c *SecuenciaRadicadoController) Put() {
+func (c *HistorialSolicitudController) Put() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
 		c.Ctx.Output.SetStatus(400); c.Data["json"] = "id inválido"; c.ServeJSON(); return
 	}
-	var v models.SecuenciaRadicado
+	var v models.HistorialSolicitud
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err != nil {
 		c.Ctx.Output.SetStatus(400); c.Data["json"] = err.Error(); c.ServeJSON(); return
 	}
 	v.Id = id
-	if err := models.UpdateSecuenciaRadicadoById(&v); err != nil {
+	if err := models.UpdateHistorialSolicitudById(&v); err != nil {
 		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
 	} else {
 		c.Data["json"] = "OK"
@@ -88,12 +104,12 @@ func (c *SecuenciaRadicadoController) Put() {
 	c.ServeJSON()
 }
 
-func (c *SecuenciaRadicadoController) Delete() {
+func (c *HistorialSolicitudController) Delete() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
 		c.Ctx.Output.SetStatus(400); c.Data["json"] = "id inválido"; c.ServeJSON(); return
 	}
-	if err := models.DeleteSecuenciaRadicado(id); err != nil {
+	if err := models.DeleteHistorialSolicitud(id); err != nil {
 		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
 	} else {
 		c.Data["json"] = "OK"

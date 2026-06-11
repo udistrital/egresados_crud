@@ -39,10 +39,11 @@ func GetUsuarioEmpresaById(id int) (v *UsuarioEmpresa, err error) {
 	return nil, err
 }
 
-func GetAllUsuarioEmpresa() (ml []UsuarioEmpresa, err error) {
-	o := orm.NewOrm()
-	_, err = o.QueryTable(new(UsuarioEmpresa)).Filter("Activo", true).RelatedSel().All(&ml)
-	return
+func GetAllUsuarioEmpresa(query map[string]string, fields []string, sortby []string,
+	order []string, offset int64, limit int64) (ml []interface{}, err error) {
+	qs := orm.NewOrm().QueryTable(new(UsuarioEmpresa)).RelatedSel()
+	var l []UsuarioEmpresa
+	return getAllQuery(qs, query, fields, sortby, order, offset, limit, &l)
 }
 
 func UpdateUsuarioEmpresaById(m *UsuarioEmpresa) (err error) {
