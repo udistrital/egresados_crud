@@ -25,10 +25,13 @@ func init() {
 
 	web.Router("/v1/beneficio", &controllers.BeneficioController{}, "get:GetAll;post:Post")
 	web.Router("/v1/beneficio/:id", &controllers.BeneficioController{}, "get:GetOne;put:Put;delete:Delete")
+	// RN-002b/c: descuento/devolución atómica de cupos (UPDATE con guard, sin race)
+	web.Router("/v1/beneficio/:id/cupo/descontar", &controllers.BeneficioController{}, "post:DescontarCupo")
+	web.Router("/v1/beneficio/:id/cupo/devolver", &controllers.BeneficioController{}, "post:DevolverCupo")
 
-	web.Router("/v1/secuencia_radicado", &controllers.SecuenciaRadicadoController{}, "get:GetAll;post:Post")
-	web.Router("/v1/secuencia_radicado/siguiente/:anio", &controllers.SecuenciaRadicadoController{}, "post:Siguiente")
-	web.Router("/v1/secuencia_radicado/:id", &controllers.SecuenciaRadicadoController{}, "get:GetOne;put:Put;delete:Delete")
+	// C-5: el radicado se genera con la SEQUENCE nativa seq_radicado_beneficio vía
+	// fn_siguiente_radicado() (DEFAULT de solicitud_beneficio.radicado). Ya no hay
+	// tabla/controlador secuencia_radicado.
 
 	web.Router("/v1/solicitud_beneficio", &controllers.SolicitudBeneficioController{}, "get:GetAll;post:Post")
 	web.Router("/v1/solicitud_beneficio/:id", &controllers.SolicitudBeneficioController{}, "get:GetOne;put:Put;delete:Delete")

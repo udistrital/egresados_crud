@@ -23,6 +23,7 @@ func (m *MensajeSolicitud) TableName() string { return "mensaje_solicitud" }
 func init() { orm.RegisterModel(new(MensajeSolicitud)) }
 
 func AddMensajeSolicitud(m *MensajeSolicitud) (id int64, err error) {
+	m.Activo = true // toda fila creada nace activa (el default(true) del ORM no aplica en INSERT)
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return

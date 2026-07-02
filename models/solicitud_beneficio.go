@@ -26,7 +26,16 @@ func (s *SolicitudBeneficio) TableName() string { return "solicitud_beneficio" }
 func init() { orm.RegisterModel(new(SolicitudBeneficio)) }
 
 func AddSolicitudBeneficio(m *SolicitudBeneficio) (id int64, err error) {
+	m.Activo = true // toda fila creada nace activa (el default(true) del ORM no aplica en INSERT)
 	o := orm.NewOrm()
+	// C-5: el radicado BNF-YYYY-NNNNNN lo genera la secuencia nativa de PostgreSQL.
+	// Si el caller no lo envía, se resuelve con fn_siguiente_radicado() (nextval atómico)
+	// antes de insertar, de modo que el POST pueda devolverlo en la respuesta.
+	if m.Radicado == "" {
+		if err = o.Raw("SELECT fn_siguiente_radicado()").QueryRow(&m.Radicado); err != nil {
+			return 0, err
+		}
+	}
 	id, err = o.Insert(m)
 	return
 }

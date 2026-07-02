@@ -49,7 +49,8 @@ func (c *SolicitudBeneficioController) Post() {
 	if id, err := models.AddSolicitudBeneficio(&v); err != nil {
 		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
 	} else {
-		c.Ctx.Output.SetStatus(201); c.Data["json"] = map[string]int64{"id": id}
+		// Se devuelve también el radicado generado por la secuencia nativa (C-5).
+		c.Ctx.Output.SetStatus(201); c.Data["json"] = map[string]interface{}{"id": id, "radicado": v.Radicado}
 	}
 	c.ServeJSON()
 }

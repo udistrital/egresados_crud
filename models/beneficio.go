@@ -34,6 +34,7 @@ func (b *Beneficio) TableName() string { return "beneficio" }
 func init() { orm.RegisterModel(new(Beneficio)) }
 
 func AddBeneficio(m *Beneficio) (id int64, err error) {
+	m.Activo = true // toda fila creada nace activa (el default(true) del ORM no aplica en INSERT)
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return
@@ -73,4 +74,31 @@ func DeleteBeneficio(id int) (err error) {
 		_, err = o.Update(&v, "Activo", "FechaModificacion")
 	}
 	return
+}
+
+// DescontarCupo resta 1 a cupos_disponibles de forma ATÓMICA (RN-002b). El guard
+// cupos_disponibles > 0 en el propio UPDATE evita la condición de carrera de dos
+// solicitudes concurrentes sobre el último cupo. Devuelve true si descontó.
+func DescontarCupo(id int) (descontado bool, err error) {
+	res, err := orm.NewOrm().Raw(
+		"UPDATE beneficio SET cupos_disponibles = cupos_disponibles - 1, fecha_modificacion = NOW() "+
+			"WHERE id = ? AND activo = TRUE AND cupos_disponibles > 0", id).Exec()
+	if err != nil {
+		return false, err
+	}
+	n, _ := res.RowsAffected()
+	return n > 0, nil
+}
+
+// DevolverCupo suma 1 a cupos_disponibles sin exceder cupos_total (RN-002c). También
+// atómico. Devuelve true si devolvió (false si ya estaba en el tope, no es error).
+func DevolverCupo(id int) (devuelto bool, err error) {
+	res, err := orm.NewOrm().Raw(
+		"UPDATE beneficio SET cupos_disponibles = cupos_disponibles + 1, fecha_modificacion = NOW() "+
+			"WHERE id = ? AND cupos_disponibles < cupos_total", id).Exec()
+	if err != nil {
+		return false, err
+	}
+	n, _ := res.RowsAffected()
+	return n > 0, nil
 }

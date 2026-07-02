@@ -25,6 +25,7 @@ func (b *BitacoraAccesoPii) TableName() string { return "bitacora_acceso_pii" }
 func init() { orm.RegisterModel(new(BitacoraAccesoPii)) }
 
 func AddBitacoraAccesoPii(m *BitacoraAccesoPii) (id int64, err error) {
+	// log inmutable: el modelo no mapea 'activo' (la columna tiene DEFAULT TRUE en la BD)
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return

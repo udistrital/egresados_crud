@@ -7,13 +7,15 @@ import (
 )
 
 // Usuario identidad local creada por JIT provisioning al autenticarse contra SGA (egresados) o Ágora (empresas).
-// TipoUsuarioId referencia parametro.parametro (tipo_parametro TIPO_USUARIO); sin FK local (C-1).
+// TipoUsuario es el discriminador LOCAL del subtipo (C-7): 'EGR' | 'EMP' | 'ADM'.
+// Junto con la PK ancla el arco exclusivo egresado/usuario_empresa (FK compuesta a nivel DDL).
 type Usuario struct {
 	Id                int       `orm:"column(id);auto;pk" json:"id"`
-	Documento         string    `orm:"column(documento);size(20);unique" json:"documento"`
+	// *string para serializar NULL: las empresas self-signup no tienen documento.
+	Documento         *string   `orm:"column(documento);size(20);null;unique" json:"documento,omitempty"`
 	Nombre            string    `orm:"column(nombre);size(200)" json:"nombre"`
 	Correo            string    `orm:"column(correo);size(150)" json:"correo"`
-	TipoUsuarioId     int       `orm:"column(tipo_usuario_id)" json:"tipo_usuario_id"`
+	TipoUsuario       string    `orm:"column(tipo_usuario);size(3)" json:"tipo_usuario"`
 	IdExterno         string    `orm:"column(id_externo);size(50);null" json:"id_externo,omitempty"`
 	SistemaOrigen     string    `orm:"column(sistema_origen);size(20)" json:"sistema_origen"`
 	UltimoAcceso      time.Time `orm:"column(ultimo_acceso);null;type(datetime)" json:"ultimo_acceso,omitempty"`
@@ -27,6 +29,7 @@ func (u *Usuario) TableName() string { return "usuario" }
 func init() { orm.RegisterModel(new(Usuario)) }
 
 func AddUsuario(m *Usuario) (id int64, err error) {
+	m.Activo = true // toda fila creada nace activa (el default(true) del ORM no aplica en INSERT)
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return
@@ -43,7 +46,7 @@ func GetUsuarioById(id int) (v *Usuario, err error) {
 
 func GetUsuarioByDocumento(documento string) (v *Usuario, err error) {
 	o := orm.NewOrm()
-	v = &Usuario{Documento: documento}
+	v = &Usuario{Documento: &documento}
 	if err = o.Read(v, "Documento"); err == nil {
 		return v, nil
 	}

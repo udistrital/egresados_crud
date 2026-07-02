@@ -28,6 +28,7 @@ func (h *HistorialSolicitud) TableName() string { return "historial_solicitud" }
 func init() { orm.RegisterModel(new(HistorialSolicitud)) }
 
 func AddHistorialSolicitud(m *HistorialSolicitud) (id int64, err error) {
+	m.Activo = true // toda fila creada nace activa (el default(true) del ORM no aplica en INSERT)
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return

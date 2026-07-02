@@ -6,10 +6,13 @@ import (
 	"github.com/beego/beego/v2/client/orm"
 )
 
-// UsuarioEmpresa relación N:M entre usuarios tipo EMPRESA y empresas.
+// UsuarioEmpresa relación N:M entre usuarios tipo EMP y empresas.
+// Subtipo EXCLUSIVO de usuario (C-7): TipoUsuario fijado a 'EMP' participa en la FK compuesta
+// (usuario_id, tipo_usuario) -> usuario(id, tipo_usuario) declarada a nivel DDL.
 type UsuarioEmpresa struct {
 	Id                int       `orm:"column(id);auto;pk" json:"id"`
 	Usuario           *Usuario  `orm:"column(usuario_id);rel(fk)" json:"usuario"`
+	TipoUsuario       string    `orm:"column(tipo_usuario);size(3);default(EMP)" json:"tipo_usuario"`
 	Empresa           *Empresa  `orm:"column(empresa_id);rel(fk)" json:"empresa"`
 	Cargo             string    `orm:"column(cargo);size(100);null" json:"cargo,omitempty"`
 	EsPrincipal       bool      `orm:"column(es_principal);default(false)" json:"es_principal"`
@@ -23,6 +26,10 @@ func (u *UsuarioEmpresa) TableName() string { return "usuario_empresa" }
 func init() { orm.RegisterModel(new(UsuarioEmpresa)) }
 
 func AddUsuarioEmpresa(m *UsuarioEmpresa) (id int64, err error) {
+	if m.TipoUsuario == "" {
+		m.TipoUsuario = "EMP" // discriminador fijo del subtipo (C-7)
+	}
+	m.Activo = true // toda fila creada nace activa (el default(true) del ORM no aplica en INSERT)
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return

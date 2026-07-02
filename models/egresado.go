@@ -6,10 +6,13 @@ import (
 	"github.com/beego/beego/v2/client/orm"
 )
 
-// Egresado perfil de egresado (1:1 con usuario tipo EGRESADO). Espejo del SGA + datos propios del módulo.
+// Egresado perfil de egresado (1:1 con usuario tipo EGR). Espejo del SGA + datos propios del módulo.
+// Subtipo EXCLUSIVO de usuario (C-7): TipoUsuario fijado a 'EGR' participa en la FK compuesta
+// (usuario_id, tipo_usuario) -> usuario(id, tipo_usuario) declarada a nivel DDL.
 type Egresado struct {
 	Id                   int       `orm:"column(id);auto;pk" json:"id"`
 	Usuario              *Usuario  `orm:"column(usuario_id);rel(fk);unique" json:"usuario"`
+	TipoUsuario          string    `orm:"column(tipo_usuario);size(3);default(EGR)" json:"tipo_usuario"`
 	CodigoInstitucional  string    `orm:"column(codigo_institucional);size(20);unique" json:"codigo_institucional"`
 	ProgramaAcademico    string    `orm:"column(programa_academico);size(150);null" json:"programa_academico,omitempty"`
 	Facultad             string    `orm:"column(facultad);size(150);null" json:"facultad,omitempty"`
@@ -25,6 +28,10 @@ func (e *Egresado) TableName() string { return "egresado" }
 func init() { orm.RegisterModel(new(Egresado)) }
 
 func AddEgresado(m *Egresado) (id int64, err error) {
+	if m.TipoUsuario == "" {
+		m.TipoUsuario = "EGR" // discriminador fijo del subtipo (C-7)
+	}
+	m.Activo = true // toda fila creada nace activa (el default(true) del ORM no aplica en INSERT)
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return

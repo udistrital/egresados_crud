@@ -85,3 +85,33 @@ func (c *BeneficioController) Delete() {
 	}
 	c.ServeJSON()
 }
+
+// DescontarCupo POST /v1/beneficio/:id/cupo/descontar — RN-002b (descuento atómico).
+func (c *BeneficioController) DescontarCupo() {
+	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	if err != nil {
+		c.Ctx.Output.SetStatus(400); c.Data["json"] = "id inválido"; c.ServeJSON(); return
+	}
+	descontado, err := models.DescontarCupo(id)
+	if err != nil {
+		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
+	} else {
+		c.Data["json"] = map[string]bool{"descontado": descontado}
+	}
+	c.ServeJSON()
+}
+
+// DevolverCupo POST /v1/beneficio/:id/cupo/devolver — RN-002c (devolución atómica).
+func (c *BeneficioController) DevolverCupo() {
+	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	if err != nil {
+		c.Ctx.Output.SetStatus(400); c.Data["json"] = "id inválido"; c.ServeJSON(); return
+	}
+	devuelto, err := models.DevolverCupo(id)
+	if err != nil {
+		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
+	} else {
+		c.Data["json"] = map[string]bool{"devuelto": devuelto}
+	}
+	c.ServeJSON()
+}
