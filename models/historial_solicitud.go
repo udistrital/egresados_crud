@@ -11,16 +11,19 @@ import (
 // con mayor fecha_cambio. EstadoAnteriorId/EstadoNuevoId referencian
 // parametro.parametro (tipo ESTADO_SOLICITUD); sin FK local (C-1).
 type HistorialSolicitud struct {
-	Id                 int                 `orm:"column(id);auto;pk" json:"id"`
-	SolicitudBeneficio *SolicitudBeneficio `orm:"column(solicitud_beneficio_id);rel(fk)" json:"solicitud_beneficio"`
-	EstadoAnteriorId   *int                `orm:"column(estado_anterior_id);null" json:"estado_anterior_id,omitempty"`
-	EstadoNuevoId      int                 `orm:"column(estado_nuevo_id)" json:"estado_nuevo_id"`
-	Usuario            *Usuario            `orm:"column(usuario_id);rel(fk)" json:"usuario"`
-	Justificacion      string              `orm:"column(justificacion);type(text);null" json:"justificacion,omitempty"`
-	FechaCambio        time.Time           `orm:"column(fecha_cambio);auto_now_add;type(datetime)" json:"fecha_cambio"`
-	Activo             bool                `orm:"column(activo);default(true)" json:"activo"`
-	FechaCreacion      time.Time           `orm:"column(fecha_creacion);auto_now_add;type(datetime)" json:"fecha_creacion"`
-	FechaModificacion  time.Time           `orm:"column(fecha_modificacion);auto_now;type(datetime)" json:"fecha_modificacion"`
+	Id                       int                 `orm:"column(id);auto;pk" json:"id"`
+	SolicitudBeneficio       *SolicitudBeneficio `orm:"column(solicitud_beneficio_id);rel(fk)" json:"solicitud_beneficio"`
+	EstadoAnteriorId         *int                `orm:"column(estado_anterior_id);null" json:"estado_anterior_id,omitempty"`
+	EstadoNuevoId            int                 `orm:"column(estado_nuevo_id)" json:"estado_nuevo_id"`
+	Usuario                  *Usuario            `orm:"column(usuario_id);rel(fk)" json:"usuario"`
+	Justificacion            string              `orm:"column(justificacion);type(text);null" json:"justificacion,omitempty"`
+	// Comprobante OPCIONAL que la empresa adjunta al aprobar (solo en la transición a APROBADA).
+	NombreArchivoComprobante string    `orm:"column(nombre_archivo_comprobante);size(300);null" json:"nombre_archivo_comprobante,omitempty"`
+	EnlaceComprobante        string    `orm:"column(enlace_comprobante);size(100);null" json:"enlace_comprobante,omitempty"`
+	FechaCambio              time.Time `orm:"column(fecha_cambio);auto_now_add;type(datetime)" json:"fecha_cambio"`
+	Activo                   bool      `orm:"column(activo);default(true)" json:"activo"`
+	FechaCreacion            time.Time `orm:"column(fecha_creacion);auto_now_add;type(datetime)" json:"fecha_creacion"`
+	FechaModificacion        time.Time `orm:"column(fecha_modificacion);auto_now;type(datetime)" json:"fecha_modificacion"`
 }
 
 func (h *HistorialSolicitud) TableName() string { return "historial_solicitud" }

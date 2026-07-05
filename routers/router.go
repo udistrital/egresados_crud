@@ -45,6 +45,15 @@ func init() {
 	web.Router("/v1/mensaje_solicitud", &controllers.MensajeSolicitudController{}, "get:GetAll;post:Post")
 	web.Router("/v1/mensaje_solicitud/:id", &controllers.MensajeSolicitudController{}, "get:GetOne;put:Put;delete:Delete")
 
+	// documento_requerido_beneficio: qué documentos exige la empresa al publicar un beneficio (RF-005)
+	web.Router("/v1/documento_requerido_beneficio", &controllers.DocumentoRequeridoBeneficioController{}, "get:GetAll;post:Post")
+	web.Router("/v1/documento_requerido_beneficio/:id", &controllers.DocumentoRequeridoBeneficioController{}, "get:GetOne;put:Put;delete:Delete")
+
+	// documento_solicitud: PDFs subidos por el egresado para cumplir los documentos requeridos de su solicitud
+	web.Router("/v1/documento_solicitud", &controllers.DocumentoSolicitudController{}, "get:GetAll;post:Post")
+	web.Router("/v1/documento_solicitud/:id", &controllers.DocumentoSolicitudController{}, "get:GetOne;put:Put;delete:Delete")
+	web.Router("/v1/documento_solicitud/solicitud/:solicitud_id", &controllers.DocumentoSolicitudController{}, "get:GetBySolicitud")
+
 	// bitacora_acceso_pii: solo lectura (log inmutable, no DELETE/PUT)
 	web.Router("/v1/bitacora_acceso_pii", &controllers.BitacoraAccesoPiiController{}, "get:GetAll;post:Post")
 	web.Router("/v1/bitacora_acceso_pii/:id", &controllers.BitacoraAccesoPiiController{}, "get:GetOne")

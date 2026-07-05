@@ -14,7 +14,7 @@ import (
 
 func init() {
 	dbUser := getEnv("BENEFICIOS_EGRESADOS_CRUD_DB_USER", "postgres")
-	dbPassword := getEnv("BENEFICIOS_EGRESADOS_CRUD_DB_PASSWORD", "")
+	dbPassword := getEnv("BENEFICIOS_EGRESADOS_CRUD_DB_PASSWORD", "1234")
 	dbHost := getEnv("BENEFICIOS_EGRESADOS_CRUD_DB_HOST", "127.0.0.1")
 	dbPort := getEnv("BENEFICIOS_EGRESADOS_CRUD_DB_PORT", "5432")
 	dbName := getEnv("BENEFICIOS_EGRESADOS_CRUD_DB_NAME", "beneficios_egresados")

@@ -385,6 +385,8 @@ CREATE TABLE historial_solicitud (
     estado_nuevo_id         INTEGER   NOT NULL,  -- ref. lógica → parametro
     usuario_id              INTEGER   NOT NULL,
     justificacion           TEXT,
+    nombre_archivo_comprobante VARCHAR(300),  -- comprobante OPCIONAL que la empresa adjunta al aprobar
+    enlace_comprobante      VARCHAR(100),      -- uid/"Enlace" en gestor_documental_mid (ref. lógica, sin FK)
     fecha_cambio            TIMESTAMP NOT NULL DEFAULT NOW(),
     activo                  BOOLEAN   NOT NULL DEFAULT TRUE,
     fecha_creacion          TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -408,6 +410,10 @@ COMMENT ON COLUMN historial_solicitud.estado_nuevo_id IS
     'Referencia LÓGICA (virtual, C-6) al estado DESTINO de la transición; nunca NULL. El estado '
     'vigente se obtiene de este campo en el registro con mayor fecha_cambio (vista '
     'v_solicitud_estado_vigente). usuario_id registra quién ejecutó el cambio (auditoría de acción).';
+COMMENT ON COLUMN historial_solicitud.enlace_comprobante IS
+    'uid/"Enlace" devuelto por gestor_documental_mid (IdTipoDocumento=167), OPCIONAL. Solo se usa en '
+    'la transición a APROBADA: la empresa puede adjuntar un comprobante (p. ej. cupón, certificado) '
+    'al aprobar la solicitud. NULL en el resto de transiciones.';
 
 CREATE INDEX idx_historial_solicitud_solicitud ON historial_solicitud(solicitud_beneficio_id);
 CREATE INDEX idx_historial_solicitud_fecha     ON historial_solicitud(fecha_cambio);
@@ -438,6 +444,75 @@ COMMENT ON TABLE mensaje_solicitud IS
     'Intercambio empresa ↔ egresado cuando una solicitud está en estado REQUIERE_INFO.';
 
 CREATE INDEX idx_mensaje_solicitud_solicitud ON mensaje_solicitud(solicitud_beneficio_id, fecha_envio);
+
+
+-- -------------------------------------------------------------
+-- Documentos requeridos por beneficio y documentos subidos en solicitud
+-- -------------------------------------------------------------
+
+-- documento_requerido_beneficio: qué documentos pide la empresa al publicar
+-- el beneficio (p. ej. "Hoja de vida", "Cédula"). El binario NO se guarda aquí:
+-- vive en el servicio institucional gestor_documental_mid (Nuxeo); este schema
+-- solo referencia el enlace/uid que ese servicio devuelve (ver documento_solicitud).
+
+CREATE TABLE documento_requerido_beneficio (
+    id                  SERIAL       NOT NULL,
+    beneficio_id        INTEGER      NOT NULL,
+    nombre              VARCHAR(200) NOT NULL,
+    descripcion         TEXT         NOT NULL,
+    activo              BOOLEAN      NOT NULL DEFAULT TRUE,
+    fecha_creacion      TIMESTAMP    NOT NULL DEFAULT NOW(),
+    fecha_modificacion  TIMESTAMP    NOT NULL DEFAULT NOW(),
+    CONSTRAINT pk_documento_requerido_beneficio PRIMARY KEY (id),
+    CONSTRAINT fk_documento_requerido_beneficio_beneficio
+        FOREIGN KEY (beneficio_id) REFERENCES beneficio(id)
+);
+COMMENT ON TABLE documento_requerido_beneficio IS
+    'Documento que la empresa exige al egresado para postularse a un beneficio '
+    '(definido al publicar el beneficio, RF-005). Solo nombre/descripción: el archivo '
+    'en sí lo sube el egresado por solicitud (ver documento_solicitud).';
+
+CREATE INDEX idx_documento_requerido_beneficio_beneficio ON documento_requerido_beneficio(beneficio_id);
+
+-- documento_solicitud: el PDF que el egresado subió para cumplir un requisito
+-- de una solicitud puntual. enlace_gestor_documental es el uid/"Enlace" que
+-- devuelve gestor_documental_mid al subir (referencia LÓGICA a un servicio
+-- externo, igual criterio que las referencias a parametro, C-6): no hay FK
+-- posible porque Nuxeo/gestor_documental_mid no pertenece a este esquema.
+
+CREATE TABLE documento_solicitud (
+    id                          SERIAL       NOT NULL,
+    solicitud_beneficio_id      INTEGER      NOT NULL,
+    documento_requerido_id      INTEGER      NOT NULL,
+    nombre_archivo              VARCHAR(300) NOT NULL,
+    enlace_gestor_documental    VARCHAR(100) NOT NULL,
+    comentario_empresa          TEXT,
+    fecha_comentario            TIMESTAMP,
+    activo                      BOOLEAN      NOT NULL DEFAULT TRUE,
+    fecha_creacion              TIMESTAMP    NOT NULL DEFAULT NOW(),
+    fecha_modificacion          TIMESTAMP    NOT NULL DEFAULT NOW(),
+    CONSTRAINT pk_documento_solicitud PRIMARY KEY (id),
+    CONSTRAINT fk_documento_solicitud_solicitud
+        FOREIGN KEY (solicitud_beneficio_id) REFERENCES solicitud_beneficio(id),
+    CONSTRAINT fk_documento_solicitud_requerido
+        FOREIGN KEY (documento_requerido_id) REFERENCES documento_requerido_beneficio(id)
+);
+COMMENT ON TABLE documento_solicitud IS
+    'PDF subido por el egresado para cumplir un documento_requerido_beneficio dentro de '
+    'una solicitud. El binario vive en gestor_documental_mid (Nuxeo); enlace_gestor_documental '
+    'es el uid ("Enlace") que ese servicio devuelve al subir — referencia lógica, sin FK '
+    '(el servicio es externo a este esquema).';
+COMMENT ON COLUMN documento_solicitud.enlace_gestor_documental IS
+    'uid/"Enlace" devuelto por gestor_documental_mid (POST document/uploadAnyFormat, '
+    'IdTipoDocumento=167). Se usa para consultar (GET document/:uid) o eliminar '
+    '(DELETE document/:uid) el archivo en Nuxeo.';
+COMMENT ON COLUMN documento_solicitud.comentario_empresa IS
+    'Observación de la empresa sobre el documento (p. ej. "no es legible", "falta la '
+    'firma"). Campo único: se sobreescribe si la empresa vuelve a comentar; fecha_comentario '
+    'registra cuándo se dejó el comentario vigente.';
+
+CREATE INDEX idx_documento_solicitud_solicitud ON documento_solicitud(solicitud_beneficio_id);
+CREATE INDEX idx_documento_solicitud_requerido ON documento_solicitud(documento_requerido_id);
 
 
 -- -------------------------------------------------------------
