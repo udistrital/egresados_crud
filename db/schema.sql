@@ -669,13 +669,13 @@ SELECT nombre, descripcion, codigo_abreviacion, activo, numero_orden,
 FROM (VALUES
     ('Límite solicitudes activas egresado',
      'Máximo de solicitudes activas por egresado (RN-010). Valor: 5',
-     'LIMITE_SOLICITUDES_ACTIVAS_EGRESADO', TRUE, 1),
+     'LIMITE_SOLIC_ACTIVAS', TRUE, 1),
     ('Paginación catálogo por defecto',
      'Tamaño de página por defecto del catálogo. Valor: 20',
-     'PAGINACION_CATALOGO_DEFAULT',         TRUE, 2),
+     'PAGINACION_DEFAULT',         TRUE, 2),
     ('Mínimo caracteres justificación rechazo',
      'Longitud mínima de la justificación al rechazar (RN-003). Valor: 20',
-     'JUSTIFICACION_RECHAZO_MIN_CARACTERES', TRUE, 3)
+     'JUSTIF_RECHAZO_MIN', TRUE, 3)
 ) AS v(nombre, descripcion, codigo_abreviacion, activo, numero_orden);
 
 SET search_path TO beneficios_egresados;
