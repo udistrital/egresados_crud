@@ -503,7 +503,7 @@ COMMENT ON TABLE documento_solicitud IS
     'es el uid ("Enlace") que ese servicio devuelve al subir — referencia lógica, sin FK '
     '(el servicio es externo a este esquema).';
 COMMENT ON COLUMN documento_solicitud.enlace_gestor_documental IS
-    'uid/"Enlace" devuelto por gestor_documental_mid (POST document/uploadAnyFormat, '
+    'uid/"Enlace" devuelto por gestor_documental_mid (POST document/upload, '
     'IdTipoDocumento=167). Se usa para consultar (GET document/:uid) o eliminar '
     '(DELETE document/:uid) el archivo en Nuxeo.';
 COMMENT ON COLUMN documento_solicitud.comentario_empresa IS
