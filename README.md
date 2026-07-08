@@ -6,9 +6,9 @@ propias del módulo sobre PostgreSQL (schema `beneficios_egresados`) siguiendo e
 contrato estándar de los `*_crud` institucionales.
 
 Este servicio no contiene lógica de negocio: la orquestación y las reglas viven en
-[`sga_mid_beneficios_egresados`](https://github.com/DanielVelandia2407/sga_mid_beneficios_egresados).
+[`egresados_service`](https://github.com/udistrital/egresados_service).
 El micro-frontend es
-[`sga_cliente_beneficios_egresados_mf`](https://github.com/DanielVelandia2407/sga_cliente_beneficios_egresados_mf).
+[`egresados_cliente`](https://github.com/udistrital/egresados_cliente).
 
 ## Especificaciones técnicas
 
@@ -95,7 +95,7 @@ filtran `Activo` implícitamente: el consumidor debe pasarlo en `query`.
 - `specs/api-crud/` — spec y tareas de esta API (contrato de listado, rutas especiales).
 - `docs/referencia-base-datos-defensa.md` — justificación tabla por tabla del modelo.
 - Las especificaciones **transversales** (visión general, autenticación, parámetros)
-  viven en `specs/system/` del repo `sga_mid_beneficios_egresados`.
+  viven en `specs/system/` del repo [`egresados_service`](https://github.com/udistrital/egresados_service).
 
 ## Contexto
 
