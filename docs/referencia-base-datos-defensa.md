@@ -24,7 +24,7 @@
 
 ---
 
-# PARTE A — CONTEXTO GENERAL (léelo antes de la defensa)
+# PARTE A — CONTEXTO GENERAL
 
 ## A.1 Historia del esquema y qué pidió cada revisión
 
