@@ -581,9 +581,12 @@ COMMENT ON VIEW v_solicitud_estado_vigente IS
 -- la tabla usuario (C-7). Solo se aprovisionan los catálogos que siguen
 -- siendo referencias lógicas a parametro.
 --
--- Ejecutar SOLO en el servicio/schema "parametro" del clúster, una vez,
--- añadiendo el area_tipo_id real y control de idempotencia (ON CONFLICT).
--- Se deja COMENTADO para evitar ejecución accidental dentro de este DDL.
+-- ⚠ YA EJECUTADO (2026-07-07): la OATI/el equipo creó estos catálogos en el
+-- servicio institucional de parámetros con los ids reales:
+--   area_tipo EGR = 32 · tipo_parametro 174-179 · parametro 7199-7230
+--   (sin colisiones de codigo_abreviacion con otras áreas — verificado).
+-- NO volver a ejecutar este bloque: duplicaría los catálogos. Se conserva
+-- comentado únicamente como registro de QUÉ se aprovisionó y por qué.
 -- =============================================================
 
 /*

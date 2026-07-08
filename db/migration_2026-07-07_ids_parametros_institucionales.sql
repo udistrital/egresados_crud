@@ -12,8 +12,9 @@
 -- Idempotente: los ids viejos (10-62) y nuevos (7199+) no se solapan,
 -- así que re-ejecutarla es un no-op.
 --
--- NOTA: db/seed_estados_beneficio.sql sigue usando los ids locales;
--- solo sirve para dev con PARAMETROS_LOCAL=true. No mezclar.
+-- NOTA: db/seed_estados_beneficio.sql y db/seed_pruebas.sql ya usan los
+-- ids institucionales (actualizados 2026-07-08); esta migración solo hace
+-- falta en BDs sembradas ANTES de esa fecha.
 -- =============================================================
 
 BEGIN;

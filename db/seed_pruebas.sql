@@ -9,10 +9,10 @@
 --     psql -d beneficios_egresados -f db/seed_pruebas.sql
 --
 -- Nota (C-6): los campos *_id de estado/categoría/sector son REFERENCIAS LÓGICAS
--- a parámetros institucionales; aquí se usan valores PLACEHOLDER (no hay FK en v4).
--- En producción esos ids los resuelve el MID contra el servicio de parámetros.
---   estado_empresa_id   = 1  (~ ACTIVA)
---   sector_economico_id = 1  (~ TEC)
+-- a parámetros institucionales (no hay FK en v4). Se usan los ids REALES del
+-- servicio institucional (creados 2026-07-07), los mismos que resuelve el MID:
+--   estado_empresa_id   = 7199  (ACTIVA)
+--   sector_economico_id = 7218  (TEC)
 -- =============================================================
 
 SET search_path TO beneficios_egresados;
@@ -30,7 +30,7 @@ INSERT INTO usuario (id, documento, nombre, correo, tipo_usuario, id_externo, si
 
 -- ── Empresa (llega ya aprobada desde Ágora; estado de ciclo de vida local) ──
 INSERT INTO empresa (id, nit, razon_social, agora_id_externo, sector_economico_id, estado_empresa_id, correo_contacto, telefono_contacto, activo) VALUES
-  (1, '900111222-3', 'Empresa Demo S.A.S.', 'AG-PROV-1', 1, 1, 'contacto@empresademo.com', '6017000000', TRUE);
+  (1, '900111222-3', 'Empresa Demo S.A.S.', 'AG-PROV-1', 7218, 7199, 'contacto@empresademo.com', '6017000000', TRUE);
 
 -- ── Vínculo usuario(EMP) ↔ empresa (C-7: tipo_usuario fijado a 'EMP') ──
 INSERT INTO usuario_empresa (id, usuario_id, tipo_usuario, empresa_id, cargo, es_principal, activo) VALUES
