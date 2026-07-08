@@ -1,0 +1,2704 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "basePath": "/v1",
+    "paths": {
+        "/beneficio/": {
+            "get": {
+                "tags": [
+                    "beneficio"
+                ],
+                "description": "Lista beneficio según el contrato estándar de listado SGA (ver README: query, fields, sortby, order, limit, offset)\n\u003cbr\u003e",
+                "operationId": "BeneficioController.GetAll",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "filtros k:v separados por coma (dot-notation para relaciones, ej. Empresa.Id:1,Activo:true)",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "campos Go a devolver, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sortby",
+                        "description": "campo(s) de orden, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order",
+                        "description": "asc|desc, uno por sortby o único para todos",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "máximo de resultados (default 10, 0 = sin límite)",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "desplazamiento (default 0)",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Beneficio"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "parámetros de query inválidos"
+                    },
+                    "404": {
+                        "description": "error de consulta en la base de datos"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "beneficio"
+                ],
+                "description": "Publica un beneficio\n\u003cbr\u003e",
+                "operationId": "BeneficioController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto beneficio a crear",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Beneficio"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{string} id \"id numérico del registro creado\""
+                    },
+                    "400": {
+                        "description": "error de parseo del body"
+                    },
+                    "500": {
+                        "description": "error interno (ej. FK inválida)"
+                    }
+                }
+            }
+        },
+        "/beneficio/{id}": {
+            "get": {
+                "tags": [
+                    "beneficio"
+                ],
+                "description": "Obtiene un beneficio por id\n\u003cbr\u003e",
+                "operationId": "BeneficioController.GetOne",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del beneficio",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Beneficio"
+                        }
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "404": {
+                        "description": "no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "beneficio"
+                ],
+                "description": "Reemplaza un beneficio completo (Update sin lista de columnas: el caller debe enviar el objeto entero)\n\u003cbr\u003e",
+                "operationId": "BeneficioController.Put",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del beneficio",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto completo a reemplazar",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Beneficio"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id o body inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "beneficio"
+                ],
+                "description": "Borrado lógico de un beneficio (activo=false)\n\u003cbr\u003e",
+                "operationId": "BeneficioController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del beneficio",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            }
+        },
+        "/beneficio/{id}/cupo/descontar": {
+            "post": {
+                "tags": [
+                    "beneficio"
+                ],
+                "description": "Descuento atómico de un cupo del beneficio (RN-002b): UPDATE ... WHERE cupos_disponibles \u003e 0, sin race conditions\n\u003cbr\u003e",
+                "operationId": "BeneficioController.DescontarCupo",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del beneficio",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} descontado \"true si se descontó el cupo\""
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "500": {
+                        "description": "sin cupos disponibles o error interno"
+                    }
+                }
+            }
+        },
+        "/beneficio/{id}/cupo/devolver": {
+            "post": {
+                "tags": [
+                    "beneficio"
+                ],
+                "description": "Devolución atómica de un cupo del beneficio (RN-002c): UPDATE ... WHERE cupos_disponibles \u003c cupos_total, sin race conditions\n\u003cbr\u003e",
+                "operationId": "BeneficioController.DevolverCupo",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del beneficio",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} devuelto \"true si se devolvió el cupo\""
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "500": {
+                        "description": "sin cupos que devolver o error interno"
+                    }
+                }
+            }
+        },
+        "/bitacora_acceso_pii/": {
+            "get": {
+                "tags": [
+                    "bitacora_acceso_pii"
+                ],
+                "description": "Lista bitacora_acceso_pii según el contrato estándar de listado SGA (ver README: query, fields, sortby, order, limit, offset)\n\u003cbr\u003e",
+                "operationId": "BitacoraAccesoPiiController.GetAll",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "filtros k:v separados por coma (dot-notation para relaciones)",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "campos Go a devolver, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sortby",
+                        "description": "campo(s) de orden, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order",
+                        "description": "asc|desc, uno por sortby o único para todos",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "máximo de resultados (default 10, 0 = sin límite)",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "desplazamiento (default 0)",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.BitacoraAccesoPii"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "parámetros de query inválidos"
+                    },
+                    "404": {
+                        "description": "error de consulta en la base de datos"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "bitacora_acceso_pii"
+                ],
+                "description": "Registra un acceso a datos PII (log inmutable: no admite Put/Delete)\n\u003cbr\u003e",
+                "operationId": "BitacoraAccesoPiiController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto bitacora_acceso_pii a crear",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.BitacoraAccesoPii"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{string} id \"id numérico del registro creado\""
+                    },
+                    "400": {
+                        "description": "error de parseo del body"
+                    },
+                    "500": {
+                        "description": "error interno (ej. FK inválida)"
+                    }
+                }
+            }
+        },
+        "/bitacora_acceso_pii/{id}": {
+            "get": {
+                "tags": [
+                    "bitacora_acceso_pii"
+                ],
+                "description": "Obtiene un registro de bitacora_acceso_pii por id\n\u003cbr\u003e",
+                "operationId": "BitacoraAccesoPiiController.GetOne",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del registro de bitácora",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.BitacoraAccesoPii"
+                        }
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "404": {
+                        "description": "no encontrado"
+                    }
+                }
+            }
+        },
+        "/documento_requerido_beneficio/": {
+            "get": {
+                "tags": [
+                    "documento_requerido_beneficio"
+                ],
+                "description": "Lista documento_requerido_beneficio según el contrato estándar de listado SGA (ver README: query, fields, sortby, order, limit, offset)\n\u003cbr\u003e",
+                "operationId": "DocumentoRequeridoBeneficioController.GetAll",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "filtros k:v separados por coma (dot-notation para relaciones)",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "campos Go a devolver, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sortby",
+                        "description": "campo(s) de orden, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order",
+                        "description": "asc|desc, uno por sortby o único para todos",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "máximo de resultados (default 10, 0 = sin límite)",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "desplazamiento (default 0)",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.DocumentoRequeridoBeneficio"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "parámetros de query inválidos"
+                    },
+                    "404": {
+                        "description": "error de consulta en la base de datos"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "documento_requerido_beneficio"
+                ],
+                "description": "Define un documento exigido por la empresa al publicar un beneficio (RF-005)\n\u003cbr\u003e",
+                "operationId": "DocumentoRequeridoBeneficioController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto documento_requerido_beneficio a crear",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DocumentoRequeridoBeneficio"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{string} id \"id numérico del registro creado\""
+                    },
+                    "400": {
+                        "description": "error de parseo del body"
+                    },
+                    "500": {
+                        "description": "error interno (ej. FK inválida)"
+                    }
+                }
+            }
+        },
+        "/documento_requerido_beneficio/{id}": {
+            "get": {
+                "tags": [
+                    "documento_requerido_beneficio"
+                ],
+                "description": "Obtiene un documento_requerido_beneficio por id\n\u003cbr\u003e",
+                "operationId": "DocumentoRequeridoBeneficioController.GetOne",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del documento requerido",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.DocumentoRequeridoBeneficio"
+                        }
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "404": {
+                        "description": "no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "documento_requerido_beneficio"
+                ],
+                "description": "Reemplaza un documento_requerido_beneficio completo (Update sin lista de columnas: el caller debe enviar el objeto entero)\n\u003cbr\u003e",
+                "operationId": "DocumentoRequeridoBeneficioController.Put",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del documento requerido",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto completo a reemplazar",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DocumentoRequeridoBeneficio"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id o body inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "documento_requerido_beneficio"
+                ],
+                "description": "Borrado lógico de un documento_requerido_beneficio (activo=false)\n\u003cbr\u003e",
+                "operationId": "DocumentoRequeridoBeneficioController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del documento requerido",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            }
+        },
+        "/documento_solicitud/": {
+            "get": {
+                "tags": [
+                    "documento_solicitud"
+                ],
+                "description": "Lista documento_solicitud según el contrato estándar de listado SGA (ver README: query, fields, sortby, order, limit, offset)\n\u003cbr\u003e",
+                "operationId": "DocumentoSolicitudController.GetAll",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "filtros k:v separados por coma (dot-notation para relaciones)",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "campos Go a devolver, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sortby",
+                        "description": "campo(s) de orden, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order",
+                        "description": "asc|desc, uno por sortby o único para todos",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "máximo de resultados (default 10, 0 = sin límite)",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "desplazamiento (default 0)",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.DocumentoSolicitud"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "parámetros de query inválidos"
+                    },
+                    "404": {
+                        "description": "error de consulta en la base de datos"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "documento_solicitud"
+                ],
+                "description": "Sube (registra) un documento del egresado para cumplir un documento requerido de su solicitud\n\u003cbr\u003e",
+                "operationId": "DocumentoSolicitudController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto documento_solicitud a crear",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DocumentoSolicitud"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{string} id \"id numérico del registro creado\""
+                    },
+                    "400": {
+                        "description": "error de parseo del body"
+                    },
+                    "500": {
+                        "description": "error interno (ej. FK inválida)"
+                    }
+                }
+            }
+        },
+        "/documento_solicitud/solicitud/{solicitud_id}": {
+            "get": {
+                "tags": [
+                    "documento_solicitud"
+                ],
+                "description": "Documentos subidos (activos) de una solicitud\n\u003cbr\u003e",
+                "operationId": "DocumentoSolicitudController.GetBySolicitud",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "solicitud_id",
+                        "description": "id de la solicitud_beneficio",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.DocumentoSolicitud"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "solicitud_id inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            }
+        },
+        "/documento_solicitud/{id}": {
+            "get": {
+                "tags": [
+                    "documento_solicitud"
+                ],
+                "description": "Obtiene un documento_solicitud por id\n\u003cbr\u003e",
+                "operationId": "DocumentoSolicitudController.GetOne",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del documento",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.DocumentoSolicitud"
+                        }
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "404": {
+                        "description": "no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "documento_solicitud"
+                ],
+                "description": "Reemplaza un documento_solicitud completo (Update sin lista de columnas: el caller debe enviar el objeto entero)\n\u003cbr\u003e",
+                "operationId": "DocumentoSolicitudController.Put",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del documento",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto completo a reemplazar",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DocumentoSolicitud"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id o body inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "documento_solicitud"
+                ],
+                "description": "Borrado lógico de un documento_solicitud (activo=false)\n\u003cbr\u003e",
+                "operationId": "DocumentoSolicitudController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del documento",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            }
+        },
+        "/egresado/": {
+            "get": {
+                "tags": [
+                    "egresado"
+                ],
+                "description": "Lista egresado según el contrato estándar de listado SGA (ver README: query, fields, sortby, order, limit, offset)\n\u003cbr\u003e",
+                "operationId": "EgresadoController.GetAll",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "filtros k:v separados por coma (dot-notation para relaciones, ej. Usuario.Activo:true)",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "campos Go a devolver, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sortby",
+                        "description": "campo(s) de orden, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order",
+                        "description": "asc|desc, uno por sortby o único para todos",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "máximo de resultados (default 10, 0 = sin límite)",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "desplazamiento (default 0)",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Egresado"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "parámetros de query inválidos"
+                    },
+                    "404": {
+                        "description": "error de consulta en la base de datos"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "egresado"
+                ],
+                "description": "Crea un egresado (subtipo exclusivo de usuario, C-7)\n\u003cbr\u003e",
+                "operationId": "EgresadoController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto egresado a crear",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Egresado"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{string} id \"id numérico del registro creado\""
+                    },
+                    "400": {
+                        "description": "error de parseo del body"
+                    },
+                    "500": {
+                        "description": "error interno (ej. FK inválida)"
+                    }
+                }
+            }
+        },
+        "/egresado/{id}": {
+            "get": {
+                "tags": [
+                    "egresado"
+                ],
+                "description": "Obtiene un egresado por id\n\u003cbr\u003e",
+                "operationId": "EgresadoController.GetOne",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del egresado",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Egresado"
+                        }
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "404": {
+                        "description": "no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "egresado"
+                ],
+                "description": "Reemplaza un egresado completo (Update sin lista de columnas: el caller debe enviar el objeto entero)\n\u003cbr\u003e",
+                "operationId": "EgresadoController.Put",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del egresado",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto completo a reemplazar",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Egresado"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id o body inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "egresado"
+                ],
+                "description": "Borrado lógico de un egresado (activo=false)\n\u003cbr\u003e",
+                "operationId": "EgresadoController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del egresado",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            }
+        },
+        "/empresa/": {
+            "get": {
+                "tags": [
+                    "empresa"
+                ],
+                "description": "Lista empresa según el contrato estándar de listado SGA (ver README: query, fields, sortby, order, limit, offset)\n\u003cbr\u003e",
+                "operationId": "EmpresaController.GetAll",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "filtros k:v separados por coma (dot-notation para relaciones)",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "campos Go a devolver, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sortby",
+                        "description": "campo(s) de orden, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order",
+                        "description": "asc|desc, uno por sortby o único para todos",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "máximo de resultados (default 10, 0 = sin límite)",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "desplazamiento (default 0)",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Empresa"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "parámetros de query inválidos"
+                    },
+                    "404": {
+                        "description": "error de consulta en la base de datos"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "empresa"
+                ],
+                "description": "Crea una empresa (llega ya aprobada desde Ágora; estado de ciclo de vida local)\n\u003cbr\u003e",
+                "operationId": "EmpresaController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto empresa a crear",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Empresa"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{string} id \"id numérico del registro creado\""
+                    },
+                    "400": {
+                        "description": "error de parseo del body"
+                    },
+                    "500": {
+                        "description": "error interno (ej. FK inválida)"
+                    }
+                }
+            }
+        },
+        "/empresa/{id}": {
+            "get": {
+                "tags": [
+                    "empresa"
+                ],
+                "description": "Obtiene una empresa por id\n\u003cbr\u003e",
+                "operationId": "EmpresaController.GetOne",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id de la empresa",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Empresa"
+                        }
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "404": {
+                        "description": "no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "empresa"
+                ],
+                "description": "Reemplaza una empresa completa (Update sin lista de columnas: el caller debe enviar el objeto entero)\n\u003cbr\u003e",
+                "operationId": "EmpresaController.Put",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id de la empresa",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto completo a reemplazar",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Empresa"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id o body inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "empresa"
+                ],
+                "description": "Borrado lógico de una empresa (activo=false)\n\u003cbr\u003e",
+                "operationId": "EmpresaController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id de la empresa",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            }
+        },
+        "/historial_solicitud/": {
+            "get": {
+                "tags": [
+                    "historial_solicitud"
+                ],
+                "description": "Lista historial_solicitud según el contrato estándar de listado SGA (ver README: query, fields, sortby, order, limit, offset)\n\u003cbr\u003e",
+                "operationId": "HistorialSolicitudController.GetAll",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "filtros k:v separados por coma (dot-notation para relaciones)",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "campos Go a devolver, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sortby",
+                        "description": "campo(s) de orden, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order",
+                        "description": "asc|desc, uno por sortby o único para todos",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "máximo de resultados (default 10, 0 = sin límite)",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "desplazamiento (default 0)",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.HistorialSolicitud"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "parámetros de query inválidos"
+                    },
+                    "404": {
+                        "description": "error de consulta en la base de datos"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "historial_solicitud"
+                ],
+                "description": "Inserta un cambio de estado en el historial (los cambios de estado son INSERT, no UPDATE, C-4b)\n\u003cbr\u003e",
+                "operationId": "HistorialSolicitudController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto historial_solicitud a crear",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.HistorialSolicitud"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{string} id \"id numérico del registro creado\""
+                    },
+                    "400": {
+                        "description": "error de parseo del body"
+                    },
+                    "500": {
+                        "description": "error interno (ej. FK inválida)"
+                    }
+                }
+            }
+        },
+        "/historial_solicitud/solicitud/{solicitud_id}": {
+            "get": {
+                "tags": [
+                    "historial_solicitud"
+                ],
+                "description": "Bitácora completa de una solicitud (más reciente primero)\n\u003cbr\u003e",
+                "operationId": "HistorialSolicitudController.GetBySolicitud",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "solicitud_id",
+                        "description": "id de la solicitud_beneficio",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.HistorialSolicitud"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "solicitud_id inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            }
+        },
+        "/historial_solicitud/solicitud/{solicitud_id}/vigente": {
+            "get": {
+                "tags": [
+                    "historial_solicitud"
+                ],
+                "description": "Último registro de historial = estado vigente de la solicitud (C-4b: el historial es la única fuente de estado)\n\u003cbr\u003e",
+                "operationId": "HistorialSolicitudController.GetVigente",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "solicitud_id",
+                        "description": "id de la solicitud_beneficio",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.HistorialSolicitud"
+                        }
+                    },
+                    "400": {
+                        "description": "solicitud_id inválido"
+                    },
+                    "404": {
+                        "description": "la solicitud no tiene historial"
+                    }
+                }
+            }
+        },
+        "/historial_solicitud/{id}": {
+            "get": {
+                "tags": [
+                    "historial_solicitud"
+                ],
+                "description": "Obtiene un registro de historial_solicitud por id\n\u003cbr\u003e",
+                "operationId": "HistorialSolicitudController.GetOne",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del registro de historial",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.HistorialSolicitud"
+                        }
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "404": {
+                        "description": "no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "historial_solicitud"
+                ],
+                "description": "Reemplaza un registro de historial_solicitud completo (Update sin lista de columnas: el caller debe enviar el objeto entero)\n\u003cbr\u003e",
+                "operationId": "HistorialSolicitudController.Put",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del registro de historial",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto completo a reemplazar",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.HistorialSolicitud"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id o body inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "historial_solicitud"
+                ],
+                "description": "Borrado lógico de un registro de historial_solicitud (activo=false)\n\u003cbr\u003e",
+                "operationId": "HistorialSolicitudController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del registro de historial",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            }
+        },
+        "/mensaje_solicitud/": {
+            "get": {
+                "tags": [
+                    "mensaje_solicitud"
+                ],
+                "description": "Lista mensaje_solicitud según el contrato estándar de listado SGA (ver README: query, fields, sortby, order, limit, offset)\n\u003cbr\u003e",
+                "operationId": "MensajeSolicitudController.GetAll",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "filtros k:v separados por coma (dot-notation para relaciones)",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "campos Go a devolver, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sortby",
+                        "description": "campo(s) de orden, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order",
+                        "description": "asc|desc, uno por sortby o único para todos",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "máximo de resultados (default 10, 0 = sin límite)",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "desplazamiento (default 0)",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.MensajeSolicitud"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "parámetros de query inválidos"
+                    },
+                    "404": {
+                        "description": "error de consulta en la base de datos"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "mensaje_solicitud"
+                ],
+                "description": "Crea un mensaje asociado a una solicitud\n\u003cbr\u003e",
+                "operationId": "MensajeSolicitudController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto mensaje_solicitud a crear",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.MensajeSolicitud"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{string} id \"id numérico del registro creado\""
+                    },
+                    "400": {
+                        "description": "error de parseo del body"
+                    },
+                    "500": {
+                        "description": "error interno (ej. FK inválida)"
+                    }
+                }
+            }
+        },
+        "/mensaje_solicitud/{id}": {
+            "get": {
+                "tags": [
+                    "mensaje_solicitud"
+                ],
+                "description": "Obtiene un mensaje_solicitud por id\n\u003cbr\u003e",
+                "operationId": "MensajeSolicitudController.GetOne",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del mensaje",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.MensajeSolicitud"
+                        }
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "404": {
+                        "description": "no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "mensaje_solicitud"
+                ],
+                "description": "Reemplaza un mensaje_solicitud completo (Update sin lista de columnas: el caller debe enviar el objeto entero)\n\u003cbr\u003e",
+                "operationId": "MensajeSolicitudController.Put",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del mensaje",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto completo a reemplazar",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.MensajeSolicitud"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id o body inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "mensaje_solicitud"
+                ],
+                "description": "Borrado lógico de un mensaje_solicitud (activo=false)\n\u003cbr\u003e",
+                "operationId": "MensajeSolicitudController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del mensaje",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            }
+        },
+        "/solicitud_beneficio/": {
+            "get": {
+                "tags": [
+                    "solicitud_beneficio"
+                ],
+                "description": "Lista solicitud_beneficio según el contrato estándar de listado SGA (ver README: query, fields, sortby, order, limit, offset)\n\u003cbr\u003e",
+                "operationId": "SolicitudBeneficioController.GetAll",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "filtros k:v separados por coma (dot-notation para relaciones, ej. Egresado.Id:1,Activo:true)",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "campos Go a devolver, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sortby",
+                        "description": "campo(s) de orden, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order",
+                        "description": "asc|desc, uno por sortby o único para todos",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "máximo de resultados (default 10, 0 = sin límite)",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "desplazamiento (default 0)",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.SolicitudBeneficio"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "parámetros de query inválidos"
+                    },
+                    "404": {
+                        "description": "error de consulta en la base de datos"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "solicitud_beneficio"
+                ],
+                "description": "Crea una solicitud de beneficio; el radicado (BNF-YYYY-NNNNNN) lo genera la secuencia nativa de PostgreSQL (C-5)\n\u003cbr\u003e",
+                "operationId": "SolicitudBeneficioController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto solicitud_beneficio a crear",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SolicitudBeneficio"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{string} id \"id numérico y radicado generado\""
+                    },
+                    "400": {
+                        "description": "error de parseo del body"
+                    },
+                    "500": {
+                        "description": "error interno (ej. FK inválida)"
+                    }
+                }
+            }
+        },
+        "/solicitud_beneficio/{id}": {
+            "get": {
+                "tags": [
+                    "solicitud_beneficio"
+                ],
+                "description": "Obtiene una solicitud_beneficio por id\n\u003cbr\u003e",
+                "operationId": "SolicitudBeneficioController.GetOne",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id de la solicitud",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.SolicitudBeneficio"
+                        }
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "404": {
+                        "description": "no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "solicitud_beneficio"
+                ],
+                "description": "Reemplaza una solicitud_beneficio completa (Update sin lista de columnas: el caller debe enviar el objeto entero)\n\u003cbr\u003e",
+                "operationId": "SolicitudBeneficioController.Put",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id de la solicitud",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto completo a reemplazar",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SolicitudBeneficio"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id o body inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "solicitud_beneficio"
+                ],
+                "description": "Borrado lógico de una solicitud_beneficio (activo=false)\n\u003cbr\u003e",
+                "operationId": "SolicitudBeneficioController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id de la solicitud",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            }
+        },
+        "/usuario/": {
+            "get": {
+                "tags": [
+                    "usuario"
+                ],
+                "description": "Lista usuario según el contrato estándar de listado SGA (ver README: query, fields, sortby, order, limit, offset)\n\u003cbr\u003e",
+                "operationId": "UsuarioController.GetAll",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "filtros k:v separados por coma (dot-notation para relaciones, ej. Egresado.Id:1,Activo:true)",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "campos Go a devolver, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sortby",
+                        "description": "campo(s) de orden, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order",
+                        "description": "asc|desc, uno por sortby o único para todos",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "máximo de resultados (default 10, 0 = sin límite)",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "desplazamiento (default 0)",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Usuario"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "parámetros de query inválidos"
+                    },
+                    "404": {
+                        "description": "error de consulta en la base de datos"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "usuario"
+                ],
+                "description": "Crea un usuario\n\u003cbr\u003e",
+                "operationId": "UsuarioController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto usuario a crear",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Usuario"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{string} id \"id numérico del registro creado\""
+                    },
+                    "400": {
+                        "description": "error de parseo del body"
+                    },
+                    "500": {
+                        "description": "error interno (ej. FK inválida)"
+                    }
+                }
+            }
+        },
+        "/usuario/{id}": {
+            "get": {
+                "tags": [
+                    "usuario"
+                ],
+                "description": "Obtiene un usuario por id\n\u003cbr\u003e",
+                "operationId": "UsuarioController.GetOne",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del usuario",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Usuario"
+                        }
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "404": {
+                        "description": "no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "usuario"
+                ],
+                "description": "Reemplaza un usuario completo (Update sin lista de columnas: el caller debe enviar el objeto entero)\n\u003cbr\u003e",
+                "operationId": "UsuarioController.Put",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del usuario",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto completo a reemplazar",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Usuario"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id o body inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "usuario"
+                ],
+                "description": "Borrado lógico de un usuario (activo=false)\n\u003cbr\u003e",
+                "operationId": "UsuarioController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del usuario",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            }
+        },
+        "/usuario_empresa/": {
+            "get": {
+                "tags": [
+                    "usuario_empresa"
+                ],
+                "description": "Lista usuario_empresa según el contrato estándar de listado SGA (ver README: query, fields, sortby, order, limit, offset)\n\u003cbr\u003e",
+                "operationId": "UsuarioEmpresaController.GetAll",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "filtros k:v separados por coma (dot-notation para relaciones)",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "campos Go a devolver, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sortby",
+                        "description": "campo(s) de orden, separados por coma",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order",
+                        "description": "asc|desc, uno por sortby o único para todos",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "máximo de resultados (default 10, 0 = sin límite)",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "desplazamiento (default 0)",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.UsuarioEmpresa"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "parámetros de query inválidos"
+                    },
+                    "404": {
+                        "description": "error de consulta en la base de datos"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "usuario_empresa"
+                ],
+                "description": "Crea el vínculo usuario(EMP) ↔ empresa (C-7: tipo_usuario fijado a 'EMP')\n\u003cbr\u003e",
+                "operationId": "UsuarioEmpresaController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto usuario_empresa a crear",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UsuarioEmpresa"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{string} id \"id numérico del registro creado\""
+                    },
+                    "400": {
+                        "description": "error de parseo del body"
+                    },
+                    "500": {
+                        "description": "error interno (ej. FK inválida)"
+                    }
+                }
+            }
+        },
+        "/usuario_empresa/{id}": {
+            "get": {
+                "tags": [
+                    "usuario_empresa"
+                ],
+                "description": "Obtiene un vínculo usuario_empresa por id\n\u003cbr\u003e",
+                "operationId": "UsuarioEmpresaController.GetOne",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del vínculo usuario_empresa",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.UsuarioEmpresa"
+                        }
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "404": {
+                        "description": "no encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "usuario_empresa"
+                ],
+                "description": "Reemplaza un usuario_empresa completo (Update sin lista de columnas: el caller debe enviar el objeto entero)\n\u003cbr\u003e",
+                "operationId": "UsuarioEmpresaController.Put",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del vínculo usuario_empresa",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "objeto completo a reemplazar",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UsuarioEmpresa"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id o body inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "usuario_empresa"
+                ],
+                "description": "Borrado lógico de un usuario_empresa (activo=false)\n\u003cbr\u003e",
+                "operationId": "UsuarioEmpresaController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id del vínculo usuario_empresa",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} OK"
+                    },
+                    "400": {
+                        "description": "id inválido"
+                    },
+                    "500": {
+                        "description": "error interno"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.Beneficio": {
+            "title": "Beneficio",
+            "type": "object",
+            "properties": {
+                "activo": {
+                    "type": "boolean"
+                },
+                "categoria_beneficio_id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "condiciones": {
+                    "type": "string"
+                },
+                "cupos_disponibles": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "cupos_total": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "descripcion": {
+                    "type": "string"
+                },
+                "empresa": {
+                    "$ref": "#/definitions/models.Empresa"
+                },
+                "estado_beneficio_id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "fecha_creacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_fin": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_inicio": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_modificacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_publicacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "imagen_url": {
+                    "type": "string"
+                },
+                "titulo": {
+                    "type": "string"
+                },
+                "usuario_creador": {
+                    "$ref": "#/definitions/models.Usuario"
+                }
+            }
+        },
+        "models.BitacoraAccesoPii": {
+            "title": "BitacoraAccesoPii",
+            "type": "object",
+            "properties": {
+                "accion": {
+                    "type": "string"
+                },
+                "detalle": {
+                    "type": "string"
+                },
+                "direccion_ip": {
+                    "type": "string"
+                },
+                "fecha_evento": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "recurso_id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "recurso_tipo": {
+                    "type": "string"
+                },
+                "user_agent": {
+                    "type": "string"
+                },
+                "usuario": {
+                    "$ref": "#/definitions/models.Usuario"
+                }
+            }
+        },
+        "models.DocumentoRequeridoBeneficio": {
+            "title": "DocumentoRequeridoBeneficio",
+            "type": "object",
+            "properties": {
+                "activo": {
+                    "type": "boolean"
+                },
+                "beneficio": {
+                    "$ref": "#/definitions/models.Beneficio"
+                },
+                "descripcion": {
+                    "type": "string"
+                },
+                "fecha_creacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_modificacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "nombre": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.DocumentoSolicitud": {
+            "title": "DocumentoSolicitud",
+            "type": "object",
+            "properties": {
+                "activo": {
+                    "type": "boolean"
+                },
+                "comentario_empresa": {
+                    "type": "string"
+                },
+                "documento_requerido": {
+                    "$ref": "#/definitions/models.DocumentoRequeridoBeneficio"
+                },
+                "enlace_gestor_documental": {
+                    "type": "string"
+                },
+                "fecha_comentario": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_creacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_modificacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "nombre_archivo": {
+                    "type": "string"
+                },
+                "solicitud_beneficio": {
+                    "$ref": "#/definitions/models.SolicitudBeneficio"
+                }
+            }
+        },
+        "models.Egresado": {
+            "title": "Egresado",
+            "type": "object",
+            "properties": {
+                "activo": {
+                    "type": "boolean"
+                },
+                "codigo_institucional": {
+                    "type": "string"
+                },
+                "facultad": {
+                    "type": "string"
+                },
+                "fecha_creacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_grado": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_modificacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "programa_academico": {
+                    "type": "string"
+                },
+                "telefono_contacto": {
+                    "type": "string"
+                },
+                "tipo_usuario": {
+                    "type": "string"
+                },
+                "usuario": {
+                    "$ref": "#/definitions/models.Usuario"
+                }
+            }
+        },
+        "models.Empresa": {
+            "title": "Empresa",
+            "type": "object",
+            "properties": {
+                "activo": {
+                    "type": "boolean"
+                },
+                "agora_id_externo": {
+                    "type": "string"
+                },
+                "correo_contacto": {
+                    "type": "string"
+                },
+                "direccion": {
+                    "type": "string"
+                },
+                "estado_empresa_id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "fecha_creacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_modificacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "nit": {
+                    "type": "string"
+                },
+                "razon_social": {
+                    "type": "string"
+                },
+                "sector_economico_id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "sitio_web": {
+                    "type": "string"
+                },
+                "telefono_contacto": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.HistorialSolicitud": {
+            "title": "HistorialSolicitud",
+            "type": "object",
+            "properties": {
+                "activo": {
+                    "type": "boolean"
+                },
+                "enlace_comprobante": {
+                    "type": "string"
+                },
+                "estado_anterior_id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "estado_nuevo_id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "fecha_cambio": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_creacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_modificacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "justificacion": {
+                    "type": "string"
+                },
+                "nombre_archivo_comprobante": {
+                    "type": "string"
+                },
+                "solicitud_beneficio": {
+                    "$ref": "#/definitions/models.SolicitudBeneficio"
+                },
+                "usuario": {
+                    "$ref": "#/definitions/models.Usuario"
+                }
+            }
+        },
+        "models.MensajeSolicitud": {
+            "title": "MensajeSolicitud",
+            "type": "object",
+            "properties": {
+                "activo": {
+                    "type": "boolean"
+                },
+                "fecha_creacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_envio": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_modificacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "mensaje": {
+                    "type": "string"
+                },
+                "solicitud_beneficio": {
+                    "$ref": "#/definitions/models.SolicitudBeneficio"
+                },
+                "usuario": {
+                    "$ref": "#/definitions/models.Usuario"
+                }
+            }
+        },
+        "models.SolicitudBeneficio": {
+            "title": "SolicitudBeneficio",
+            "type": "object",
+            "properties": {
+                "activo": {
+                    "type": "boolean"
+                },
+                "beneficio": {
+                    "$ref": "#/definitions/models.Beneficio"
+                },
+                "datos_complementarios": {
+                    "type": "string"
+                },
+                "egresado": {
+                    "$ref": "#/definitions/models.Egresado"
+                },
+                "fecha_creacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_modificacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_solicitud": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "radicado": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Usuario": {
+            "title": "Usuario",
+            "type": "object",
+            "properties": {
+                "activo": {
+                    "type": "boolean"
+                },
+                "correo": {
+                    "type": "string"
+                },
+                "documento": {
+                    "type": "string"
+                },
+                "fecha_creacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_modificacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "id_externo": {
+                    "type": "string"
+                },
+                "nombre": {
+                    "type": "string"
+                },
+                "sistema_origen": {
+                    "type": "string"
+                },
+                "tipo_usuario": {
+                    "type": "string"
+                },
+                "ultimo_acceso": {
+                    "type": "string",
+                    "format": "datetime"
+                }
+            }
+        },
+        "models.UsuarioEmpresa": {
+            "title": "UsuarioEmpresa",
+            "type": "object",
+            "properties": {
+                "activo": {
+                    "type": "boolean"
+                },
+                "cargo": {
+                    "type": "string"
+                },
+                "empresa": {
+                    "$ref": "#/definitions/models.Empresa"
+                },
+                "es_principal": {
+                    "type": "boolean"
+                },
+                "fecha_creacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "fecha_modificacion": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "tipo_usuario": {
+                    "type": "string"
+                },
+                "usuario": {
+                    "$ref": "#/definitions/models.Usuario"
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "bitacora_acceso_pii",
+            "description": "BitacoraAccesoPiiController — log inmutable, solo permite GET y POST.\n"
+        }
+    ]
+}

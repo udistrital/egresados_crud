@@ -1,4 +1,4 @@
-<#
+﻿<#
   smoke_test.ps1 — Prueba end-to-end del CRUD (genera beneficio + solicitud).
 
   Requisitos previos:

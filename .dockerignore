@@ -1,0 +1,9 @@
+.git
+.gitignore
+.drone.yml
+README.md
+LICENSE
+docs
+specs
+scripts
+*.md

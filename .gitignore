@@ -6,7 +6,7 @@
 *.dylib
 app
 main
-sga_crud_beneficios_egresados
+egresados_crud
 
 # Go workspace
 vendor/

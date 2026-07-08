@@ -748,7 +748,7 @@ este esquema. El DDL incluye, al final y **comentado**, un script-guía de los
 Los cambios estructurales de v4 **aún no se reflejan** en los microservicios. Al retomar el
 backend hay que sincronizar:
 
-1. **CRUD (`sga_crud_beneficios_egresados`)**:
+1. **CRUD (`egresados_crud`)**:
    - `models/usuario.go`: `tipo_usuario_id int` → `tipo_usuario string` (EGR/EMP/ADM).
    - `models/egresado.go` y `models/usuario_empresa.go`: agregar campo `tipo_usuario` y la FK
      compuesta (en Beego ORM, vía `rel(fk)` no aplica directo; se valida la pareja o se deja la
