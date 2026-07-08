@@ -1,4 +1,4 @@
-module github.com/udistrital/sga_crud_beneficios_egresados
+module github.com/udistrital/egresados_crud
 
 go 1.22.0
 

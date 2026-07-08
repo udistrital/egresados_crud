@@ -19,7 +19,7 @@ egresado y datos de empresa (on-demand de SGA/Ágora), user store (WSO2).
 
 ## Repos involucrados
 
-- `sga_crud_beneficios_egresados` — dueño del schema (`db/schema.sql`) y de los modelos ORM.
+- `egresados_crud` — dueño del schema (`db/schema.sql`) y de los modelos ORM.
 - `sga_mid_beneficios_egresados` — valida pertenencia de los ids de parámetro (C-6) y aplica reglas.
 
 ## Inventario
