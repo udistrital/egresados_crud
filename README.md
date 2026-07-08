@@ -18,16 +18,17 @@ El micro-frontend es
 
 ### Decisiones de diseño relevantes
 
-- **Sin catálogos locales (C-1):** `tipo_usuario`, `estado_*`, `categoria_beneficio`,
+- **Sin catálogos locales (C-1):** `estado_*`, `categoria_beneficio`,
   `sector_economico` y `parametro_sistema` viven en el servicio institucional de
-  parámetros de la OATI. Los campos que los referencian son ids planos
-  (`*int` los nullable). La semilla de `tipo_parametro`/`parametro` está al final de
-  `db/schema.sql`.
+  parámetros de la OATI (creados el 2026-07-07). Los campos que los referencian son
+  ids planos (`*int` los nullable). `tipo_usuario` es un discriminador local (C-7).
+  El apéndice al final de `db/schema.sql` documenta qué se aprovisionó (comentado,
+  ya ejecutado — no volver a correr).
 - **Historial como única fuente de estado (C-4b):** `solicitud_beneficio` no tiene
   campo de estado; el estado vigente es el último registro de `historial_solicitud`
   (endpoint `/vigente`). Los cambios de estado son INSERT en el historial.
-- **Radicados (C-4a):** `secuencia_radicado` garantiza unicidad con transacción
-  `SELECT ... FOR UPDATE` (`POST /v1/secuencia_radicado/siguiente/:anio`).
+- **Radicados (C-5):** los genera la base de datos al insertar la solicitud
+  (`fn_siguiente_radicado()` sobre secuencia nativa, DEFAULT de la columna).
   Formato: `BNF-YYYY-NNNNNN`.
 
 ## Variables de entorno
@@ -61,12 +62,14 @@ Cada entidad expone `GET /` (listado), `POST /`, `GET /:id`, `PUT /:id` y
 
 `usuario` · `egresado` · `empresa` · `usuario_empresa` · `beneficio` ·
 `solicitud_beneficio` · `historial_solicitud` · `mensaje_solicitud` ·
-`secuencia_radicado` · `bitacora_acceso_pii` (solo GET/POST, log inmutable)
+`documento_requerido_beneficio` · `documento_solicitud` ·
+`bitacora_acceso_pii` (solo GET/POST, log inmutable)
 
 Rutas especiales:
 
 ```
-POST /v1/secuencia_radicado/siguiente/:anio            → siguiente número de radicado (FOR UPDATE)
+POST /v1/beneficio/:id/cupo/descontar                  → descuento atómico de cupo (RN-002b)
+POST /v1/beneficio/:id/cupo/devolver                   → devolución atómica de cupo (RN-002c)
 GET  /v1/historial_solicitud/solicitud/:id             → bitácora de la solicitud (desc)
 GET  /v1/historial_solicitud/solicitud/:id/vigente     → estado vigente (C-4b)
 ```
@@ -85,6 +88,14 @@ Mismo contrato que los `*_crud` institucionales (variante de `terceros_crud`):
 
 La lista vacía responde `200` con `[{}]` (idioma estándar del SGA). Los GetAll **no**
 filtran `Activo` implícitamente: el consumidor debe pasarlo en `query`.
+
+## Documentación (SDD)
+
+- `specs/base-datos/` — spec del schema (decisiones C-1…C-7, constraints).
+- `specs/api-crud/` — spec y tareas de esta API (contrato de listado, rutas especiales).
+- `docs/referencia-base-datos-defensa.md` — justificación tabla por tabla del modelo.
+- Las especificaciones **transversales** (visión general, autenticación, parámetros)
+  viven en `specs/system/` del repo `sga_mid_beneficios_egresados`.
 
 ## Contexto
 
