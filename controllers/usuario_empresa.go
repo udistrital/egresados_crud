@@ -25,11 +25,15 @@ type UsuarioEmpresaController struct{ web.Controller }
 func (c *UsuarioEmpresaController) GetAll() {
 	query, fields, sortby, order, offset, limit, err := parseGetAllParams(&c.Controller)
 	if err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = err.Error(); c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = err.Error()
+		c.ServeJSON()
+		return
 	}
 	l, err := models.GetAllUsuarioEmpresa(query, fields, sortby, order, offset, limit)
 	if err != nil {
-		c.Ctx.Output.SetStatus(404); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(404)
+		c.Data["json"] = err.Error()
 	} else {
 		if l == nil {
 			l = append(l, map[string]interface{}{})
@@ -49,11 +53,15 @@ func (c *UsuarioEmpresaController) GetAll() {
 func (c *UsuarioEmpresaController) GetOne() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = "id inválido"; c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = "id inválido"
+		c.ServeJSON()
+		return
 	}
 	result, err := models.GetUsuarioEmpresaById(id)
 	if err != nil {
-		c.Ctx.Output.SetStatus(404); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(404)
+		c.Data["json"] = err.Error()
 	} else {
 		c.Data["json"] = result
 	}
@@ -70,12 +78,17 @@ func (c *UsuarioEmpresaController) GetOne() {
 func (c *UsuarioEmpresaController) Post() {
 	var v models.UsuarioEmpresa
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = err.Error(); c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = err.Error()
+		c.ServeJSON()
+		return
 	}
 	if id, err := models.AddUsuarioEmpresa(&v); err != nil {
-		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(500)
+		c.Data["json"] = err.Error()
 	} else {
-		c.Ctx.Output.SetStatus(201); c.Data["json"] = map[string]int64{"id": id}
+		c.Ctx.Output.SetStatus(201)
+		c.Data["json"] = map[string]int64{"id": id}
 	}
 	c.ServeJSON()
 }
@@ -91,15 +104,22 @@ func (c *UsuarioEmpresaController) Post() {
 func (c *UsuarioEmpresaController) Put() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = "id inválido"; c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = "id inválido"
+		c.ServeJSON()
+		return
 	}
 	var v models.UsuarioEmpresa
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = err.Error(); c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = err.Error()
+		c.ServeJSON()
+		return
 	}
 	v.Id = id
 	if err := models.UpdateUsuarioEmpresaById(&v); err != nil {
-		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(500)
+		c.Data["json"] = err.Error()
 	} else {
 		c.Data["json"] = "OK"
 	}
@@ -116,10 +136,14 @@ func (c *UsuarioEmpresaController) Put() {
 func (c *UsuarioEmpresaController) Delete() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = "id inválido"; c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = "id inválido"
+		c.ServeJSON()
+		return
 	}
 	if err := models.DeleteUsuarioEmpresa(id); err != nil {
-		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(500)
+		c.Data["json"] = err.Error()
 	} else {
 		c.Data["json"] = "OK"
 	}

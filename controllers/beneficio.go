@@ -25,11 +25,15 @@ type BeneficioController struct{ web.Controller }
 func (c *BeneficioController) GetAll() {
 	query, fields, sortby, order, offset, limit, err := parseGetAllParams(&c.Controller)
 	if err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = err.Error(); c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = err.Error()
+		c.ServeJSON()
+		return
 	}
 	l, err := models.GetAllBeneficio(query, fields, sortby, order, offset, limit)
 	if err != nil {
-		c.Ctx.Output.SetStatus(404); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(404)
+		c.Data["json"] = err.Error()
 	} else {
 		if l == nil {
 			// lista vacía → [{}]: idioma estándar de los *_crud del SGA
@@ -50,11 +54,15 @@ func (c *BeneficioController) GetAll() {
 func (c *BeneficioController) GetOne() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = "id inválido"; c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = "id inválido"
+		c.ServeJSON()
+		return
 	}
 	result, err := models.GetBeneficioById(id)
 	if err != nil {
-		c.Ctx.Output.SetStatus(404); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(404)
+		c.Data["json"] = err.Error()
 	} else {
 		c.Data["json"] = result
 	}
@@ -71,12 +79,17 @@ func (c *BeneficioController) GetOne() {
 func (c *BeneficioController) Post() {
 	var v models.Beneficio
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = err.Error(); c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = err.Error()
+		c.ServeJSON()
+		return
 	}
 	if id, err := models.AddBeneficio(&v); err != nil {
-		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(500)
+		c.Data["json"] = err.Error()
 	} else {
-		c.Ctx.Output.SetStatus(201); c.Data["json"] = map[string]int64{"id": id}
+		c.Ctx.Output.SetStatus(201)
+		c.Data["json"] = map[string]int64{"id": id}
 	}
 	c.ServeJSON()
 }
@@ -92,15 +105,22 @@ func (c *BeneficioController) Post() {
 func (c *BeneficioController) Put() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = "id inválido"; c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = "id inválido"
+		c.ServeJSON()
+		return
 	}
 	var v models.Beneficio
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = err.Error(); c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = err.Error()
+		c.ServeJSON()
+		return
 	}
 	v.Id = id
 	if err := models.UpdateBeneficioById(&v); err != nil {
-		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(500)
+		c.Data["json"] = err.Error()
 	} else {
 		c.Data["json"] = "OK"
 	}
@@ -117,10 +137,14 @@ func (c *BeneficioController) Put() {
 func (c *BeneficioController) Delete() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = "id inválido"; c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = "id inválido"
+		c.ServeJSON()
+		return
 	}
 	if err := models.DeleteBeneficio(id); err != nil {
-		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(500)
+		c.Data["json"] = err.Error()
 	} else {
 		c.Data["json"] = "OK"
 	}
@@ -137,11 +161,15 @@ func (c *BeneficioController) Delete() {
 func (c *BeneficioController) DescontarCupo() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = "id inválido"; c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = "id inválido"
+		c.ServeJSON()
+		return
 	}
 	descontado, err := models.DescontarCupo(id)
 	if err != nil {
-		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(500)
+		c.Data["json"] = err.Error()
 	} else {
 		c.Data["json"] = map[string]bool{"descontado": descontado}
 	}
@@ -158,11 +186,15 @@ func (c *BeneficioController) DescontarCupo() {
 func (c *BeneficioController) DevolverCupo() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = "id inválido"; c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = "id inválido"
+		c.ServeJSON()
+		return
 	}
 	devuelto, err := models.DevolverCupo(id)
 	if err != nil {
-		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(500)
+		c.Data["json"] = err.Error()
 	} else {
 		c.Data["json"] = map[string]bool{"devuelto": devuelto}
 	}
