@@ -10,23 +10,23 @@ import (
 // CategoriaBeneficioId y EstadoBeneficioId referencian parametro.parametro
 // (tipos CATEGORIA_BENEFICIO y ESTADO_BENEFICIO); sin FK local (C-1).
 type Beneficio struct {
-	Id                   int      `orm:"column(id);auto;pk" json:"id"`
-	Empresa              *Empresa `orm:"column(empresa_id);rel(fk)" json:"empresa"`
-	CategoriaBeneficioId int      `orm:"column(categoria_beneficio_id)" json:"categoria_beneficio_id"`
-	EstadoBeneficioId    int      `orm:"column(estado_beneficio_id)" json:"estado_beneficio_id"`
-	Titulo             string             `orm:"column(titulo);size(200)" json:"titulo"`
-	Descripcion        string             `orm:"column(descripcion);type(text)" json:"descripcion"`
-	Condiciones        string             `orm:"column(condiciones);type(text)" json:"condiciones"`
-	FechaInicio        time.Time          `orm:"column(fecha_inicio);type(date)" json:"fecha_inicio"`
-	FechaFin           time.Time          `orm:"column(fecha_fin);type(date)" json:"fecha_fin"`
-	CuposTotal         int                `orm:"column(cupos_total)" json:"cupos_total"`
-	CuposDisponibles   int                `orm:"column(cupos_disponibles)" json:"cupos_disponibles"`
-	ImagenUrl          string             `orm:"column(imagen_url);size(500);null" json:"imagen_url,omitempty"`
-	FechaPublicacion   time.Time          `orm:"column(fecha_publicacion);null;type(datetime)" json:"fecha_publicacion,omitempty"`
-	UsuarioCreador     *Usuario           `orm:"column(usuario_creador_id);rel(fk)" json:"usuario_creador"`
-	Activo             bool               `orm:"column(activo);default(true)" json:"activo"`
-	FechaCreacion      time.Time          `orm:"column(fecha_creacion);auto_now_add;type(datetime)" json:"fecha_creacion"`
-	FechaModificacion  time.Time          `orm:"column(fecha_modificacion);auto_now;type(datetime)" json:"fecha_modificacion"`
+	Id                   int       `orm:"column(id);auto;pk" json:"id"`
+	Empresa              *Empresa  `orm:"column(empresa_id);rel(fk)" json:"empresa"`
+	CategoriaBeneficioId int       `orm:"column(categoria_beneficio_id)" json:"categoria_beneficio_id"`
+	EstadoBeneficioId    int       `orm:"column(estado_beneficio_id)" json:"estado_beneficio_id"`
+	Titulo               string    `orm:"column(titulo);size(200)" json:"titulo"`
+	Descripcion          string    `orm:"column(descripcion);type(text)" json:"descripcion"`
+	Condiciones          string    `orm:"column(condiciones);type(text)" json:"condiciones"`
+	FechaInicio          time.Time `orm:"column(fecha_inicio);type(date)" json:"fecha_inicio"`
+	FechaFin             time.Time `orm:"column(fecha_fin);type(date)" json:"fecha_fin"`
+	CuposTotal           int       `orm:"column(cupos_total)" json:"cupos_total"`
+	CuposDisponibles     int       `orm:"column(cupos_disponibles)" json:"cupos_disponibles"`
+	ImagenUrl            string    `orm:"column(imagen_url);size(500);null" json:"imagen_url,omitempty"`
+	FechaPublicacion     time.Time `orm:"column(fecha_publicacion);null;type(datetime)" json:"fecha_publicacion,omitempty"`
+	UsuarioCreador       *Usuario  `orm:"column(usuario_creador_id);rel(fk)" json:"usuario_creador"`
+	Activo               bool      `orm:"column(activo);default(true)" json:"activo"`
+	FechaCreacion        time.Time `orm:"column(fecha_creacion);auto_now_add;type(datetime)" json:"fecha_creacion"`
+	FechaModificacion    time.Time `orm:"column(fecha_modificacion);auto_now;type(datetime)" json:"fecha_modificacion"`
 }
 
 func (b *Beneficio) TableName() string { return "beneficio" }
