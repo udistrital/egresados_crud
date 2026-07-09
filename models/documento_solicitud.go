@@ -12,16 +12,16 @@ import (
 // EnlaceGestorDocumental es el uid ("Enlace") que ese servicio devuelve al
 // subir — referencia lógica, sin FK (el servicio es externo a este esquema).
 type DocumentoSolicitud struct {
-	Id                   int                          `orm:"column(id);auto;pk" json:"id"`
-	SolicitudBeneficio   *SolicitudBeneficio           `orm:"column(solicitud_beneficio_id);rel(fk)" json:"solicitud_beneficio"`
-	DocumentoRequerido   *DocumentoRequeridoBeneficio  `orm:"column(documento_requerido_id);rel(fk)" json:"documento_requerido"`
-	NombreArchivo        string                       `orm:"column(nombre_archivo);size(300)" json:"nombre_archivo"`
-	EnlaceGestorDocumental string                     `orm:"column(enlace_gestor_documental);size(100)" json:"enlace_gestor_documental"`
-	ComentarioEmpresa    string                       `orm:"column(comentario_empresa);type(text);null" json:"comentario_empresa,omitempty"`
-	FechaComentario      time.Time                    `orm:"column(fecha_comentario);null;type(datetime)" json:"fecha_comentario,omitempty"`
-	Activo               bool                         `orm:"column(activo);default(true)" json:"activo"`
-	FechaCreacion        time.Time                    `orm:"column(fecha_creacion);auto_now_add;type(datetime)" json:"fecha_creacion"`
-	FechaModificacion    time.Time                    `orm:"column(fecha_modificacion);auto_now;type(datetime)" json:"fecha_modificacion"`
+	Id                     int                          `orm:"column(id);auto;pk" json:"id"`
+	SolicitudBeneficio     *SolicitudBeneficio          `orm:"column(solicitud_beneficio_id);rel(fk)" json:"solicitud_beneficio"`
+	DocumentoRequerido     *DocumentoRequeridoBeneficio `orm:"column(documento_requerido_id);rel(fk)" json:"documento_requerido"`
+	NombreArchivo          string                       `orm:"column(nombre_archivo);size(300)" json:"nombre_archivo"`
+	EnlaceGestorDocumental string                       `orm:"column(enlace_gestor_documental);size(100)" json:"enlace_gestor_documental"`
+	ComentarioEmpresa      string                       `orm:"column(comentario_empresa);type(text);null" json:"comentario_empresa,omitempty"`
+	FechaComentario        time.Time                    `orm:"column(fecha_comentario);null;type(datetime)" json:"fecha_comentario,omitempty"`
+	Activo                 bool                         `orm:"column(activo);default(true)" json:"activo"`
+	FechaCreacion          time.Time                    `orm:"column(fecha_creacion);auto_now_add;type(datetime)" json:"fecha_creacion"`
+	FechaModificacion      time.Time                    `orm:"column(fecha_modificacion);auto_now;type(datetime)" json:"fecha_modificacion"`
 }
 
 func (d *DocumentoSolicitud) TableName() string { return "documento_solicitud" }

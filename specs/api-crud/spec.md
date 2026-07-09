@@ -1,4 +1,4 @@
-# Spec — API CRUD (`sga_crud_beneficios_egresados`)
+# Spec — API CRUD (`egresados_crud`)
 
 > **Última actualización:** 2026-07-08 · **Estado:** implementado y en uso por el
 > MID. Deriva del `BACKEND_SPEC.md` original, actualizado al contrato real.
@@ -19,7 +19,7 @@ resolución de catálogos (ids planos).
 
 ## Repos involucrados
 
-- `sga_crud_beneficios_egresados` (este) — Go + Beego + Beego ORM + PostgreSQL.
+- `egresados_crud` (este) — Go + Beego + Beego ORM + PostgreSQL.
 - Consumidor único: `sga_mid_beneficios_egresados`. El frontend nunca lo llama.
 
 ## Requisitos
@@ -44,7 +44,7 @@ resolución de catálogos (ids planos).
 
 - Envelope: respuestas Beego directas (objeto o array JSON); errores con status HTTP correcto — los POST/PUT fallidos deben devolver status ≠ 2xx (bug corregido 2026-07-02: antes se tragaban en silencio).
 - El MID normaliza `[{}]` → `[]` (`normalizarListaVacia` con `json.Compact`) y valida status en GET/POST/PUT.
-- Variables de entorno: `BENEFICIOS_EGRESADOS_CRUD_DB_{USER,PASSWORD,HOST,NAME,PORT}`, `BENEFICIOS_EGRESADOS_CRUD_RUNMODE`, `BENEFICIOS_EGRESADOS_CRUD_PORT` (dev: 8080).
+- Variables de entorno: `EGRESADOS_CRUD_DB_{USER,PASS,URL,NAME,PORT,SCHEMA}`, `EGRESADOS_CRUD_RUNMODE`, `EGRESADOS_CRUD_HTTPPORT` (dev: 8080), `PARAMETER_STORE`.
 
 ## Criterios de aceptación
 

@@ -40,6 +40,12 @@
 --       vez la FK de egresado (exige EGR) y la de usuario_empresa (exige EMP):
 --       la exclusividad queda garantizada en DDL puro, sin triggers.
 --
+--   [C-8] Estandarización de tipos de dato de texto:
+--     · Todos los campos de texto (nombre, correo, razón social, descripciones,
+--       mensajes, justificaciones, comentarios, etc.) usan VARCHAR(n) con
+--       longitud explícita en lugar de TEXT, para acotar el tamaño máximo
+--       almacenable y hacer explícito el límite esperado por el negocio.
+--
 -- CAMBIOS HEREDADOS (v2/v3/v3.1):
 --   · Catálogos locales eliminados → referencias a parámetros institucionales.
 --   · historial_solicitud unificada; estado vigente = último registro.
@@ -248,8 +254,8 @@ CREATE TABLE beneficio (
     categoria_beneficio_id  INTEGER      NOT NULL, -- ref. lógica → parametro (C-6)
     estado_beneficio_id     INTEGER      NOT NULL, -- ref. lógica → parametro (C-6)
     titulo                  VARCHAR(200) NOT NULL,
-    descripcion             TEXT         NOT NULL,
-    condiciones             TEXT         NOT NULL,
+    descripcion             VARCHAR(2000) NOT NULL,
+    condiciones             VARCHAR(2000) NOT NULL,
     fecha_inicio            DATE         NOT NULL,
     fecha_fin               DATE         NOT NULL,
     cupos_total             INTEGER      NOT NULL,
@@ -384,7 +390,7 @@ CREATE TABLE historial_solicitud (
     estado_anterior_id      INTEGER,             -- ref. lógica → parametro (NULL en estado inicial)
     estado_nuevo_id         INTEGER   NOT NULL,  -- ref. lógica → parametro
     usuario_id              INTEGER   NOT NULL,
-    justificacion           TEXT,
+    justificacion           VARCHAR(1000),
     nombre_archivo_comprobante VARCHAR(300),  -- comprobante OPCIONAL que la empresa adjunta al aprobar
     enlace_comprobante      VARCHAR(100),      -- uid/"Enlace" en gestor_documental_mid (ref. lógica, sin FK)
     fecha_cambio            TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -429,7 +435,7 @@ CREATE TABLE mensaje_solicitud (
     id                      SERIAL    NOT NULL,
     solicitud_beneficio_id  INTEGER   NOT NULL,
     usuario_id              INTEGER   NOT NULL,
-    mensaje                 TEXT      NOT NULL,
+    mensaje                 VARCHAR(2000) NOT NULL,
     fecha_envio             TIMESTAMP NOT NULL DEFAULT NOW(),
     activo                  BOOLEAN   NOT NULL DEFAULT TRUE,
     fecha_creacion          TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -459,7 +465,7 @@ CREATE TABLE documento_requerido_beneficio (
     id                  SERIAL       NOT NULL,
     beneficio_id        INTEGER      NOT NULL,
     nombre              VARCHAR(200) NOT NULL,
-    descripcion         TEXT         NOT NULL,
+    descripcion         VARCHAR(500) NOT NULL,
     activo              BOOLEAN      NOT NULL DEFAULT TRUE,
     fecha_creacion      TIMESTAMP    NOT NULL DEFAULT NOW(),
     fecha_modificacion  TIMESTAMP    NOT NULL DEFAULT NOW(),
@@ -486,7 +492,7 @@ CREATE TABLE documento_solicitud (
     documento_requerido_id      INTEGER      NOT NULL,
     nombre_archivo              VARCHAR(300) NOT NULL,
     enlace_gestor_documental    VARCHAR(100) NOT NULL,
-    comentario_empresa          TEXT,
+    comentario_empresa          VARCHAR(1000),
     fecha_comentario            TIMESTAMP,
     activo                      BOOLEAN      NOT NULL DEFAULT TRUE,
     fecha_creacion              TIMESTAMP    NOT NULL DEFAULT NOW(),

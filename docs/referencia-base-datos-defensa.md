@@ -4,27 +4,7 @@
 > para la sustentación (el schema v4 es el actual). La spec resumida es
 > `specs/base-datos/spec.md`; el DDL es `db/schema.sql` (este repo).
 
-> **Cómo usar este documento (modo sustentación):** está pensado para Ctrl+F. Si te
-> preguntan por una tabla, busca su nombre (p. ej. `## TABLA: solicitud_beneficio`) y
-> encontrarás, en este orden:
-> 1. **Para qué sirve** (funcionalidad).
-> 2. **Por qué es necesaria** (la defensa: por qué existe y no se eliminó/delegó).
-> 3. **Campos** (cada uno con su propósito y justificación).
-> 4. **Constraints e índices** (qué garantizan).
-> 5. **Preguntas probables del revisor → respuesta lista.**
->
-> Esquema: `beneficios_egresados` (PostgreSQL). Archivo DDL: `db/schema.sql`.
-> OJO: este documento describe el corte v4 del 2026-06-18; el DDL actual añade
-> además `documento_solicitud` + comprobante de aprobación (2026-07-05), `usuario.documento`
-> nullable + `uq_usuario_id_externo` (2026-07-02) y la semilla con ids institucionales.
-> Submódulo del SGA — Universidad Distrital Francisco José de Caldas.
-> 9 tablas locales + 1 vista + 1 secuencia nativa + 1 función. Los catálogos
-> (estado/categoría/sector) son **referencias lógicas** al servicio institucional de
-> parámetros (sin FK declarada).
-
----
-
-# PARTE A — CONTEXTO GENERAL (léelo antes de la defensa)
+# PARTE A — CONTEXTO GENERAL
 
 ## A.1 Historia del esquema y qué pidió cada revisión
 
@@ -768,7 +748,7 @@ este esquema. El DDL incluye, al final y **comentado**, un script-guía de los
 Los cambios estructurales de v4 **aún no se reflejan** en los microservicios. Al retomar el
 backend hay que sincronizar:
 
-1. **CRUD (`sga_crud_beneficios_egresados`)**:
+1. **CRUD (`egresados_crud`)**:
    - `models/usuario.go`: `tipo_usuario_id int` → `tipo_usuario string` (EGR/EMP/ADM).
    - `models/egresado.go` y `models/usuario_empresa.go`: agregar campo `tipo_usuario` y la FK
      compuesta (en Beego ORM, vía `rel(fk)` no aplica directo; se valida la pareja o se deja la
