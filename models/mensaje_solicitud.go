@@ -8,14 +8,14 @@ import (
 
 // MensajeSolicitud intercambio empresa ↔ egresado cuando la solicitud está en REQUIERE_INFO (RF-007).
 type MensajeSolicitud struct {
-	Id                  int                 `orm:"column(id);auto;pk" json:"id"`
-	SolicitudBeneficio  *SolicitudBeneficio `orm:"column(solicitud_beneficio_id);rel(fk)" json:"solicitud_beneficio"`
-	Usuario             *Usuario            `orm:"column(usuario_id);rel(fk)" json:"usuario"`
-	Mensaje             string              `orm:"column(mensaje);type(text)" json:"mensaje"`
-	FechaEnvio          time.Time           `orm:"column(fecha_envio);auto_now_add;type(datetime)" json:"fecha_envio"`
-	Activo              bool                `orm:"column(activo);default(true)" json:"activo"`
-	FechaCreacion       time.Time           `orm:"column(fecha_creacion);auto_now_add;type(datetime)" json:"fecha_creacion"`
-	FechaModificacion   time.Time           `orm:"column(fecha_modificacion);auto_now;type(datetime)" json:"fecha_modificacion"`
+	Id                 int                 `orm:"column(id);auto;pk" json:"id"`
+	SolicitudBeneficio *SolicitudBeneficio `orm:"column(solicitud_beneficio_id);rel(fk)" json:"solicitud_beneficio"`
+	Usuario            *Usuario            `orm:"column(usuario_id);rel(fk)" json:"usuario"`
+	Mensaje            string              `orm:"column(mensaje);type(text)" json:"mensaje"`
+	FechaEnvio         time.Time           `orm:"column(fecha_envio);auto_now_add;type(datetime)" json:"fecha_envio"`
+	Activo             bool                `orm:"column(activo);default(true)" json:"activo"`
+	FechaCreacion      time.Time           `orm:"column(fecha_creacion);auto_now_add;type(datetime)" json:"fecha_creacion"`
+	FechaModificacion  time.Time           `orm:"column(fecha_modificacion);auto_now;type(datetime)" json:"fecha_modificacion"`
 }
 
 func (m *MensajeSolicitud) TableName() string { return "mensaje_solicitud" }

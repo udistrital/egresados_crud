@@ -25,11 +25,15 @@ type SolicitudBeneficioController struct{ web.Controller }
 func (c *SolicitudBeneficioController) GetAll() {
 	query, fields, sortby, order, offset, limit, err := parseGetAllParams(&c.Controller)
 	if err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = err.Error(); c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = err.Error()
+		c.ServeJSON()
+		return
 	}
 	l, err := models.GetAllSolicitudBeneficio(query, fields, sortby, order, offset, limit)
 	if err != nil {
-		c.Ctx.Output.SetStatus(404); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(404)
+		c.Data["json"] = err.Error()
 	} else {
 		if l == nil {
 			l = append(l, map[string]interface{}{})
@@ -49,11 +53,15 @@ func (c *SolicitudBeneficioController) GetAll() {
 func (c *SolicitudBeneficioController) GetOne() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = "id inválido"; c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = "id inválido"
+		c.ServeJSON()
+		return
 	}
 	result, err := models.GetSolicitudBeneficioById(id)
 	if err != nil {
-		c.Ctx.Output.SetStatus(404); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(404)
+		c.Data["json"] = err.Error()
 	} else {
 		c.Data["json"] = result
 	}
@@ -70,13 +78,18 @@ func (c *SolicitudBeneficioController) GetOne() {
 func (c *SolicitudBeneficioController) Post() {
 	var v models.SolicitudBeneficio
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = err.Error(); c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = err.Error()
+		c.ServeJSON()
+		return
 	}
 	if id, err := models.AddSolicitudBeneficio(&v); err != nil {
-		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(500)
+		c.Data["json"] = err.Error()
 	} else {
 		// Se devuelve también el radicado generado por la secuencia nativa (C-5).
-		c.Ctx.Output.SetStatus(201); c.Data["json"] = map[string]interface{}{"id": id, "radicado": v.Radicado}
+		c.Ctx.Output.SetStatus(201)
+		c.Data["json"] = map[string]interface{}{"id": id, "radicado": v.Radicado}
 	}
 	c.ServeJSON()
 }
@@ -92,15 +105,22 @@ func (c *SolicitudBeneficioController) Post() {
 func (c *SolicitudBeneficioController) Put() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = "id inválido"; c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = "id inválido"
+		c.ServeJSON()
+		return
 	}
 	var v models.SolicitudBeneficio
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = err.Error(); c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = err.Error()
+		c.ServeJSON()
+		return
 	}
 	v.Id = id
 	if err := models.UpdateSolicitudBeneficioById(&v); err != nil {
-		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(500)
+		c.Data["json"] = err.Error()
 	} else {
 		c.Data["json"] = "OK"
 	}
@@ -117,10 +137,14 @@ func (c *SolicitudBeneficioController) Put() {
 func (c *SolicitudBeneficioController) Delete() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if err != nil {
-		c.Ctx.Output.SetStatus(400); c.Data["json"] = "id inválido"; c.ServeJSON(); return
+		c.Ctx.Output.SetStatus(400)
+		c.Data["json"] = "id inválido"
+		c.ServeJSON()
+		return
 	}
 	if err := models.DeleteSolicitudBeneficio(id); err != nil {
-		c.Ctx.Output.SetStatus(500); c.Data["json"] = err.Error()
+		c.Ctx.Output.SetStatus(500)
+		c.Data["json"] = err.Error()
 	} else {
 		c.Data["json"] = "OK"
 	}

@@ -10,7 +10,7 @@ import (
 // TipoUsuario es el discriminador LOCAL del subtipo (C-7): 'EGR' | 'EMP' | 'ADM'.
 // Junto con la PK ancla el arco exclusivo egresado/usuario_empresa (FK compuesta a nivel DDL).
 type Usuario struct {
-	Id                int       `orm:"column(id);auto;pk" json:"id"`
+	Id int `orm:"column(id);auto;pk" json:"id"`
 	// *string para serializar NULL: las empresas self-signup no tienen documento.
 	Documento         *string   `orm:"column(documento);size(20);null;unique" json:"documento,omitempty"`
 	Nombre            string    `orm:"column(nombre);size(200)" json:"nombre"`

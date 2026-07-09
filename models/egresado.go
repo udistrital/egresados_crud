@@ -10,17 +10,17 @@ import (
 // Subtipo EXCLUSIVO de usuario (C-7): TipoUsuario fijado a 'EGR' participa en la FK compuesta
 // (usuario_id, tipo_usuario) -> usuario(id, tipo_usuario) declarada a nivel DDL.
 type Egresado struct {
-	Id                   int       `orm:"column(id);auto;pk" json:"id"`
-	Usuario              *Usuario  `orm:"column(usuario_id);rel(fk);unique" json:"usuario"`
-	TipoUsuario          string    `orm:"column(tipo_usuario);size(3);default(EGR)" json:"tipo_usuario"`
-	CodigoInstitucional  string    `orm:"column(codigo_institucional);size(20);unique" json:"codigo_institucional"`
-	ProgramaAcademico    string    `orm:"column(programa_academico);size(150);null" json:"programa_academico,omitempty"`
-	Facultad             string    `orm:"column(facultad);size(150);null" json:"facultad,omitempty"`
-	FechaGrado           time.Time `orm:"column(fecha_grado);null;type(date)" json:"fecha_grado,omitempty"`
-	TelefonoContacto     string    `orm:"column(telefono_contacto);size(20);null" json:"telefono_contacto,omitempty"`
-	Activo               bool      `orm:"column(activo);default(true)" json:"activo"`
-	FechaCreacion        time.Time `orm:"column(fecha_creacion);auto_now_add;type(datetime)" json:"fecha_creacion"`
-	FechaModificacion    time.Time `orm:"column(fecha_modificacion);auto_now;type(datetime)" json:"fecha_modificacion"`
+	Id                  int       `orm:"column(id);auto;pk" json:"id"`
+	Usuario             *Usuario  `orm:"column(usuario_id);rel(fk);unique" json:"usuario"`
+	TipoUsuario         string    `orm:"column(tipo_usuario);size(3);default(EGR)" json:"tipo_usuario"`
+	CodigoInstitucional string    `orm:"column(codigo_institucional);size(20);unique" json:"codigo_institucional"`
+	ProgramaAcademico   string    `orm:"column(programa_academico);size(150);null" json:"programa_academico,omitempty"`
+	Facultad            string    `orm:"column(facultad);size(150);null" json:"facultad,omitempty"`
+	FechaGrado          time.Time `orm:"column(fecha_grado);null;type(date)" json:"fecha_grado,omitempty"`
+	TelefonoContacto    string    `orm:"column(telefono_contacto);size(20);null" json:"telefono_contacto,omitempty"`
+	Activo              bool      `orm:"column(activo);default(true)" json:"activo"`
+	FechaCreacion       time.Time `orm:"column(fecha_creacion);auto_now_add;type(datetime)" json:"fecha_creacion"`
+	FechaModificacion   time.Time `orm:"column(fecha_modificacion);auto_now;type(datetime)" json:"fecha_modificacion"`
 }
 
 func (e *Egresado) TableName() string { return "egresado" }
