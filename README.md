@@ -108,7 +108,17 @@ docker ps
 
 ### Ejecución docker-compose
 ```shell
-# No implementado actualmente.
+# El stack local completo (Postgres + CRUD + MID) se levanta con el
+# docker-compose.yml del directorio PADRE (raíz del workspace Pasantias),
+# que construye este repo con Dockerfile.local (multi-stage: compila
+# dentro del contenedor, no requiere Go en el host).
+
+cd ..
+docker compose up -d --build
+
+# La BD nace desde db/schema.sql (initdb, solo el primer arranque del
+# volumen). Datos demo opcionales:
+docker compose exec -T db psql -U postgres -d beneficios_egresados < sga_crud_beneficios_egresados/db/seed_pruebas.sql
 ```
 
 ## Estado CI
