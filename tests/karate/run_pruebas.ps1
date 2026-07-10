@@ -14,7 +14,8 @@
 # =============================================================================
 param(
     [switch]$NoReseed,
-    [string]$PsqlPath   = 'C:\Program Files\PostgreSQL\16\bin\psql.exe',
+    # Vacío = auto-detectar (PATH y luego C:\Program Files\PostgreSQL\<ver>\bin)
+    [string]$PsqlPath   = '',
     [string]$DbUser     = $(if ($env:EGRESADOS_CRUD_DB_USER) { $env:EGRESADOS_CRUD_DB_USER } else { 'postgres' }),
     [string]$DbPassword = $(if ($env:EGRESADOS_CRUD_DB_PASS) { $env:EGRESADOS_CRUD_DB_PASS } else { '12345' }),
     # BD EXCLUSIVA de pruebas: la suite trunca/siembra datos, por eso NUNCA se
@@ -25,6 +26,20 @@ $ErrorActionPreference = 'Stop'
 
 $raizKarate = $PSScriptRoot
 $raizCrud   = (Resolve-Path (Join-Path $raizKarate '..\..')).Path
+
+if (-not $PsqlPath) {
+    $cmd = Get-Command psql -ErrorAction SilentlyContinue
+    if ($cmd) { $PsqlPath = $cmd.Source }
+    else {
+        $PsqlPath = Get-ChildItem 'C:\Program Files\PostgreSQL\*\bin\psql.exe' -ErrorAction SilentlyContinue |
+            Sort-Object { $v = 0; [int]::TryParse($_.Directory.Parent.Name, [ref]$v) | Out-Null; $v } -Descending |
+            Select-Object -First 1 -ExpandProperty FullName
+    }
+    if (-not $PsqlPath) {
+        throw 'No se encontró psql.exe (ni en el PATH ni en C:\Program Files\PostgreSQL\<ver>\bin). Instala PostgreSQL 16+ o indica la ruta con -PsqlPath.'
+    }
+    Write-Host "Usando psql: $PsqlPath"
+}
 
 function Esperar-Puerto([int]$puerto, [string]$nombre) {
     foreach ($i in 1..60) {
