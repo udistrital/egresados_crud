@@ -12,9 +12,9 @@
 
   Qué hace (replica el flujo de CrearSolicitud del MID, pero directo al CRUD):
     POST /beneficio              → publica un beneficio de la empresa demo (id=1)
-    POST /solicitud_beneficio    → el egresado demo (id=1) solicita ese beneficio
+    POST /solicitud-beneficio    → el egresado demo (id=1) solicita ese beneficio
                                    (el radicado lo genera la SEQUENCE nativa, C-5)
-    POST /historial_solicitud    → registro inicial de estado PENDIENTE (C-4b)
+    POST /historial-solicitud    → registro inicial de estado PENDIENTE (C-4b)
     GET  .../vigente             → confirma el estado vigente derivado del historial
 #>
 param(
@@ -60,7 +60,7 @@ $solicitud = @{
   beneficio             = @{ id = $benId }
   datos_complementarios = '{"motivacion":"Interesado en continuar estudios de posgrado"}'
 }
-$rSol = Post "/solicitud_beneficio" $solicitud
+$rSol = Post "/solicitud-beneficio" $solicitud
 $solId    = $rSol.id
 $radicado = $rSol.radicado
 Write-Host ("[OK] Solicitud creada     -> id = {0}, radicado = {1}" -f $solId, $radicado) -ForegroundColor Green
@@ -72,11 +72,11 @@ $historial = @{
   usuario             = @{ id = 2 }                     # el propio egresado
   justificacion       = "Creación de la solicitud (estado inicial)."
 }
-$null = Post "/historial_solicitud" $historial
+$null = Post "/historial-solicitud" $historial
 Write-Host "[OK] Historial inicial     -> PENDIENTE" -ForegroundColor Green
 
 # 4) Verificar estado vigente derivado del historial ------------------------
-$vigente = Get- ("/historial_solicitud/solicitud/{0}/vigente" -f $solId)
+$vigente = Get- ("/historial-solicitud/solicitud/{0}/vigente" -f $solId)
 Write-Host "`n== Estado vigente de la solicitud ==" -ForegroundColor Cyan
 $vigente | ConvertTo-Json -Depth 6
 

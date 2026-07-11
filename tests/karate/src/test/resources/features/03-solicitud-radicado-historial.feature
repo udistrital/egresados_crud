@@ -30,47 +30,47 @@ Feature: Solicitud - radicado por la BD (C-5) e historial como única fuente de 
     * def beneficioId = response.id
 
     # La solicitud se crea SIN radicado: lo pone la BD
-    Given path 'solicitud_beneficio'
+    Given path 'solicitud-beneficio'
     And request { egresado: { id: '#(egresadoSeedId)' }, beneficio: { id: '#(beneficioId)' } }
     When method post
     Then status 201
     * def solicitudId = response.id
 
-    Given path 'solicitud_beneficio', solicitudId
+    Given path 'solicitud-beneficio', solicitudId
     When method get
     Then status 200
     And match response.radicado == '#regex BNF-\\d{4}-\\d{6}'
 
     # Sin historial todavía: /vigente responde 404 (la solicitud no tiene estado)
-    Given path 'historial_solicitud/solicitud', solicitudId, 'vigente'
+    Given path 'historial-solicitud/solicitud', solicitudId, 'vigente'
     When method get
     Then status 404
 
     # Primer registro: nace PENDIENTE (sin estado_anterior)
-    Given path 'historial_solicitud'
+    Given path 'historial-solicitud'
     And request { solicitud_beneficio: { id: '#(solicitudId)' }, estado_nuevo_id: '#(estadoSolicitudPendiente)', usuario: { id: '#(usuarioEgresadoSeedId)' } }
     When method post
     Then status 201
 
-    Given path 'historial_solicitud/solicitud', solicitudId, 'vigente'
+    Given path 'historial-solicitud/solicitud', solicitudId, 'vigente'
     When method get
     Then status 200
     And match response.estado_nuevo_id == estadoSolicitudPendiente
 
     # Segundo registro: PENDIENTE → EN_REVISION; /vigente devuelve el más reciente
-    Given path 'historial_solicitud'
+    Given path 'historial-solicitud'
     And request { solicitud_beneficio: { id: '#(solicitudId)' }, estado_anterior_id: '#(estadoSolicitudPendiente)', estado_nuevo_id: '#(estadoSolicitudEnRevision)', usuario: { id: '#(usuarioEmpresaSeedId)' }, justificacion: 'revisión iniciada por la suite' }
     When method post
     Then status 201
 
-    Given path 'historial_solicitud/solicitud', solicitudId, 'vigente'
+    Given path 'historial-solicitud/solicitud', solicitudId, 'vigente'
     When method get
     Then status 200
     And match response.estado_nuevo_id == estadoSolicitudEnRevision
     And match response.estado_anterior_id == estadoSolicitudPendiente
 
     # La bitácora completa llega con el más reciente primero
-    Given path 'historial_solicitud/solicitud', solicitudId
+    Given path 'historial-solicitud/solicitud', solicitudId
     When method get
     Then status 200
     And match response == '#[2]'

@@ -16,8 +16,8 @@ param(
     [switch]$NoReseed,
     # Vacío = auto-detectar (PATH y luego C:\Program Files\PostgreSQL\<ver>\bin)
     [string]$PsqlPath   = '',
-    [string]$DbUser     = $(if ($env:EGRESADOS_CRUD_DB_USER) { $env:EGRESADOS_CRUD_DB_USER } else { 'postgres' }),
-    [string]$DbPassword = $(if ($env:EGRESADOS_CRUD_DB_PASS) { $env:EGRESADOS_CRUD_DB_PASS } else { '12345' }),
+    [string]$DbUser     = $(if ($env:EGRESADOS_CRUD_PGUSER) { $env:EGRESADOS_CRUD_PGUSER } else { 'postgres' }),
+    [string]$DbPassword = $(if ($env:EGRESADOS_CRUD_PGPASS) { $env:EGRESADOS_CRUD_PGPASS } else { '12345' }),
     # BD EXCLUSIVA de pruebas: la suite trunca/siembra datos, por eso NUNCA se
     # apunta a la BD de desarrollo (beneficios_egresados). Se crea sola si falta.
     [string]$DbName     = 'beneficios_egresados_pruebas'
@@ -88,16 +88,16 @@ Pop-Location
 $proc = $null
 try {
     Write-Host "Levantando CRUD (:8080) contra la BD $DbName..."
-    # Nombres de env estandarizados por la universidad (conf/app.conf, 2026-07-09):
+    # Nombres de env estandarizados por la universidad (conf/app.conf, 2026-07-10):
     # EGRESADOS_CRUD_* — sin default quemado, hay que setear TODAS.
-    $env:EGRESADOS_CRUD_HTTPPORT  = '8080'
-    $env:EGRESADOS_CRUD_RUNMODE   = 'dev'
-    $env:EGRESADOS_CRUD_DB_USER   = $DbUser
-    $env:EGRESADOS_CRUD_DB_PASS   = $DbPassword
-    $env:EGRESADOS_CRUD_DB_URL    = '127.0.0.1'
-    $env:EGRESADOS_CRUD_DB_PORT   = '5432'
-    $env:EGRESADOS_CRUD_DB_NAME   = $DbName
-    $env:EGRESADOS_CRUD_DB_SCHEMA = 'beneficios_egresados'
+    $env:EGRESADOS_CRUD_HTTP_PORT = '8080'
+    $env:EGRESADOS_CRUD_RUN_MODE  = 'dev'
+    $env:EGRESADOS_CRUD_PGUSER    = $DbUser
+    $env:EGRESADOS_CRUD_PGPASS    = $DbPassword
+    $env:EGRESADOS_CRUD_PGHOST    = '127.0.0.1'
+    $env:EGRESADOS_CRUD_PGPORT    = '5432'
+    $env:EGRESADOS_CRUD_PGDB      = $DbName
+    $env:EGRESADOS_CRUD_PGSCHEMA  = 'beneficios_egresados'
     $proc = Start-Process (Join-Path $binDir 'crud_pruebas.exe') -WorkingDirectory $raizCrud -PassThru -WindowStyle Hidden
     Esperar-Puerto 8080 'CRUD'
 
