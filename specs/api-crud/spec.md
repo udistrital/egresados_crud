@@ -24,7 +24,7 @@ resolución de catálogos (ids planos).
 
 ## Requisitos
 
-1. **CRUD por entidad** bajo `/v1`: `usuario`, `egresado`, `empresa`, `usuario_empresa`, `beneficio`, `solicitud_beneficio`, `historial_solicitud`, `mensaje_solicitud`, `documento_solicitud`, `bitacora_acceso_pii`.
+1. **CRUD por entidad** bajo `/v1`: `usuario`, `egresado`, `empresa`, `usuario-empresa`, `beneficio`, `solicitud-beneficio`, `historial-solicitud`, `mensaje-solicitud`, `documento-solicitud`, `bitacora-acceso-pii`.
 2. **DSL de consulta en todos los GetAll** (contrato de `terceros_crud`, la variante más completa del SGA), centralizado en `models/getall_query.go` + `controllers/getall_params.go` (no copy-paste por entidad):
    - `query=` con dot-notation (`.`→`__`), `__in` con `|`, `__icontainsall`, `isnull`, y operadores nativos del ORM (`__gte`, `__icontains`, …).
    - `fields`, `sortby`, `order`, `limit` (default 10; `limit=0` = todos), `offset`.
@@ -35,8 +35,8 @@ resolución de catálogos (ids planos).
    - `POST /v1/beneficio/:id/cupo/devolver` — `UPDATE … WHERE cupos_disponibles < cupos_total`.
    - Sin race conditions; devuelven error si no hay cupo que mover.
 5. **Historial / estado vigente (C-4b):**
-   - `GET /v1/historial_solicitud/solicitud/:solicitud_id` — bitácora, más reciente primero.
-   - `GET /v1/historial_solicitud/solicitud/:solicitud_id/vigente` — estado actual.
+   - `GET /v1/historial-solicitud/solicitud/:solicitud_id` — bitácora, más reciente primero.
+   - `GET /v1/historial-solicitud/solicitud/:solicitud_id/vigente` — estado actual.
 6. **Ids de catálogo planos:** campos que referencian parámetros institucionales son `int` (`*int` si nullable, para serializar NULL). Relaciones locales sí son objetos ORM (`{id}`).
 7. **PUT reemplaza la fila completa** (`o.Update` sin lista de columnas): el caller debe leer el objeto y mandar el row entero.
 
@@ -44,7 +44,7 @@ resolución de catálogos (ids planos).
 
 - Envelope: respuestas Beego directas (objeto o array JSON); errores con status HTTP correcto — los POST/PUT fallidos deben devolver status ≠ 2xx (bug corregido 2026-07-02: antes se tragaban en silencio).
 - El MID normaliza `[{}]` → `[]` (`normalizarListaVacia` con `json.Compact`) y valida status en GET/POST/PUT.
-- Variables de entorno: `EGRESADOS_CRUD_DB_{USER,PASS,URL,NAME,PORT,SCHEMA}`, `EGRESADOS_CRUD_RUNMODE`, `EGRESADOS_CRUD_HTTPPORT` (dev: 8080), `PARAMETER_STORE`.
+- Variables de entorno: `EGRESADOS_CRUD_PG{USER,PASS,HOST,PORT,DB,SCHEMA}`, `EGRESADOS_CRUD_RUN_MODE`, `EGRESADOS_CRUD_HTTP_PORT` (dev: 8080), `PARAMETER_STORE`.
 
 ## Criterios de aceptación
 

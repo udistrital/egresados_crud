@@ -40,21 +40,23 @@ todas las tablas (excepto `bitacora_acceso_pii`, que es log inmutable).
 ### Variables de Entorno
 
 Definidas en [`conf/app.conf`](conf/app.conf) vía `${VAR||default}` (expansión nativa
-de Beego). Si una variable no está seteada, `main.go` cae a los defaults de
-desarrollo local.
+de Beego). La conexión a Postgres la arma `database.BuildPostgresConnectionString()`
+(`utils_oas/v2`) a partir de `PGuser/PGpass/PGhost/PGport/PGdb/PGschema` — **sin
+defaults propios**: si falta alguna, se intenta conectar igual con lo que haya
+(típicamente falla explícito, no falla en silencio contra la base equivocada).
 
 ```shell
 # Parámetros de la API
-EGRESADOS_CRUD_HTTPPORT=8080
-EGRESADOS_CRUD_RUNMODE=dev
+EGRESADOS_CRUD_HTTP_PORT=8080
+EGRESADOS_CRUD_RUN_MODE=dev
 
 # Database
-EGRESADOS_CRUD_DB_USER=postgres
-EGRESADOS_CRUD_DB_PASS=postgres
-EGRESADOS_CRUD_DB_URL=localhost
-EGRESADOS_CRUD_DB_NAME=beneficios_egresados
-EGRESADOS_CRUD_DB_SCHEMA=beneficios_egresados
-EGRESADOS_CRUD_DB_PORT=5432
+EGRESADOS_CRUD_PGUSER=postgres
+EGRESADOS_CRUD_PGPASS=postgres
+EGRESADOS_CRUD_PGHOST=localhost
+EGRESADOS_CRUD_PGDB=beneficios_egresados
+EGRESADOS_CRUD_PGSCHEMA=beneficios_egresados
+EGRESADOS_CRUD_PGPORT=5432
 
 # Institucional
 PARAMETER_STORE=
@@ -75,8 +77,8 @@ git pull origin develop && git checkout develop
 psql -U postgres -f db/schema.sql
 
 # 5. Configurar las variables de entorno
-export EGRESADOS_CRUD_RUNMODE=dev
-export EGRESADOS_CRUD_DB_PASS=postgres
+export EGRESADOS_CRUD_RUN_MODE=dev
+export EGRESADOS_CRUD_PGPASS=postgres
 
 # 6. Ejecutar el proyecto
 bee run
@@ -92,13 +94,13 @@ docker build -t egresados_crud .
 
 # 2. Ejecutar el contenedor
 docker run --name egresados_crud \
-  -e EGRESADOS_CRUD_RUNMODE=dev \
-  -e EGRESADOS_CRUD_DB_USER=postgres \
-  -e EGRESADOS_CRUD_DB_PASS=postgres \
-  -e EGRESADOS_CRUD_DB_URL=host.docker.internal \
-  -e EGRESADOS_CRUD_DB_PORT=5432 \
-  -e EGRESADOS_CRUD_DB_NAME=beneficios_egresados \
-  -e EGRESADOS_CRUD_DB_SCHEMA=beneficios_egresados \
+  -e EGRESADOS_CRUD_RUN_MODE=dev \
+  -e EGRESADOS_CRUD_PGUSER=postgres \
+  -e EGRESADOS_CRUD_PGPASS=postgres \
+  -e EGRESADOS_CRUD_PGHOST=host.docker.internal \
+  -e EGRESADOS_CRUD_PGPORT=5432 \
+  -e EGRESADOS_CRUD_PGDB=beneficios_egresados \
+  -e EGRESADOS_CRUD_PGSCHEMA=beneficios_egresados \
   -p 8080:8080 \
   egresados_crud
 
@@ -142,18 +144,18 @@ docker compose exec -T db psql -U postgres -d beneficios_egresados < sga_crud_be
 Cada entidad expone `GET /` (listado), `POST /`, `GET /:id`, `PUT /:id` y
 `DELETE /:id` (borrado lógico) bajo `/v1`:
 
-`usuario` · `egresado` · `empresa` · `usuario_empresa` · `beneficio` ·
-`solicitud_beneficio` · `historial_solicitud` · `mensaje_solicitud` ·
-`documento_requerido_beneficio` · `documento_solicitud` ·
-`bitacora_acceso_pii` (solo GET/POST, log inmutable)
+`usuario` · `egresado` · `empresa` · `usuario-empresa` · `beneficio` ·
+`solicitud-beneficio` · `historial-solicitud` · `mensaje-solicitud` ·
+`documento-requerido-beneficio` · `documento-solicitud` ·
+`bitacora-acceso-pii` (solo GET/POST, log inmutable)
 
 Rutas especiales:
 
 ```
 POST /v1/beneficio/:id/cupo/descontar                  → descuento atómico de cupo (RN-002b)
 POST /v1/beneficio/:id/cupo/devolver                   → devolución atómica de cupo (RN-002c)
-GET  /v1/historial_solicitud/solicitud/:id             → bitácora de la solicitud (desc)
-GET  /v1/historial_solicitud/solicitud/:id/vigente     → estado vigente (C-4b)
+GET  /v1/historial-solicitud/solicitud/:id             → bitácora de la solicitud (desc)
+GET  /v1/historial-solicitud/solicitud/:id/vigente     → estado vigente (C-4b)
 ```
 
 Documentación interactiva (Swagger UI, generada con `bee generate docs`):
