@@ -6,19 +6,9 @@ import (
 )
 
 func init() {
-	// Los catálogos (tipo_usuario, estados, categorías, sectores, parámetros de
-	// sistema) viven en el servicio institucional de parámetros (C-1);
-	// este CRUD solo expone las entidades propias del módulo.
-	//
-	// Rutas registradas vía NSInclude a partir de las anotaciones @router de cada
-	// controller (routers/commentsRouter.go, generado con `bee generate routers`).
-	// C-5: el radicado se genera con la SEQUENCE nativa seq_radicado_beneficio vía
-	// fn_siguiente_radicado() (DEFAULT de solicitud_beneficio.radicado). Ya no hay
-	// tabla/controlador secuencia_radicado.
-	// historial_solicitud: única fuente de estado de las solicitudes (C-4b)
-	// documento_requerido_beneficio: qué documentos exige la empresa al publicar un beneficio (RF-005)
-	// documento_solicitud: PDFs subidos por el egresado para cumplir los documentos requeridos de su solicitud
-	// bitacora_acceso_pii: solo lectura (log inmutable, no DELETE/PUT)
+	// Los catálogos viven en el servicio institucional de parámetros (C-1); este
+	// CRUD solo expone las entidades propias del módulo. Rutas registradas vía
+	// NSInclude a partir de las anotaciones @router de cada controller.
 	ns := web.NewNamespace("/v1",
 		web.NSNamespace("/usuario",
 			web.NSInclude(&controllers.UsuarioController{}),
